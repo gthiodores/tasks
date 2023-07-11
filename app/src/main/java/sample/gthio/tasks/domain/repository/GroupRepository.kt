@@ -1,0 +1,13 @@
+package sample.gthio.tasks.domain.repository
+
+import kotlinx.coroutines.flow.Flow
+import sample.gthio.tasks.domain.model.DomainGroup
+import java.util.*
+
+interface GroupRepository {
+    val groups: Flow<List<DomainGroup>>
+
+    suspend fun insertGroup(group: DomainGroup)
+
+    suspend fun deleteGroupById(id: UUID)
+}
