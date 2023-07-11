@@ -10,4 +10,6 @@ interface GroupRepository {
     suspend fun insertGroup(group: DomainGroup)
 
     suspend fun deleteGroupById(id: UUID)
+
+    suspend fun updateGroup(group: DomainGroup)
 }

@@ -10,4 +10,6 @@ interface TagRepository {
     suspend fun insertTag(tag: DomainTag)
 
     suspend fun deleteTagById(uuid: UUID)
+
+    suspend fun updateTag(tag: DomainTag)
 }

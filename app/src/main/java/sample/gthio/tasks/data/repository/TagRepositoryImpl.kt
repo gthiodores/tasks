@@ -21,4 +21,10 @@ fun defaultTagRepository(tagSource: TagLocalSource): TagRepository = object : Ta
     override suspend fun deleteTagById(uuid: UUID) {
         tagSource.deleteById(uuid)
     }
+
+    override suspend fun updateTag(tag: DomainTag) {
+        tagSource.update(tag)
+    }
+
+
 }
