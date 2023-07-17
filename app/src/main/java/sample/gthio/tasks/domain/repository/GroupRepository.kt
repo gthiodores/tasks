@@ -12,4 +12,8 @@ interface GroupRepository {
     suspend fun deleteGroupById(id: UUID)
 
     suspend fun updateGroup(group: DomainGroup)
+
+    suspend fun existsById(id: UUID): Boolean
+
+    suspend fun observeById(id: UUID): Flow<DomainGroup?>
 }

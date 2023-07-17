@@ -1,12 +1,11 @@
 package sample.gthio.tasks.data.source
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.withContext
 import sample.gthio.tasks.data.model.DataGroup
 import sample.gthio.tasks.domain.model.DomainGroup
-import java.util.UUID
+import java.util.*
 
 interface GroupLocalSource {
     val groups: Flow<List<DataGroup>>
@@ -16,6 +15,10 @@ interface GroupLocalSource {
     suspend fun deleteById(id: UUID)
 
     suspend fun update(group: DomainGroup)
+
+    suspend fun getById(id: UUID): DataGroup?
+
+    suspend fun observeById(id: UUID): Flow<DataGroup?>
 }
 
 fun inMemoryGroupSource(): GroupLocalSource = object : GroupLocalSource {
@@ -23,16 +26,33 @@ fun inMemoryGroupSource(): GroupLocalSource = object : GroupLocalSource {
     override val groups: Flow<List<DataGroup>> = _group.asStateFlow()
 
     override suspend fun insert(group: DomainGroup) {
-        _group.update { groups -> groups + DataGroup.from(group) }
+        withContext(Dispatchers.IO) {
+            _group.update { groups -> groups + DataGroup.from(group) }
+        }
     }
 
     override suspend fun deleteById(id: UUID) {
-        _group.update { groups -> groups.filterNot { group -> group.id == id } }
+        withContext(Dispatchers.IO) {
+            _group.update { groups -> groups.filterNot { group -> group.id == id } }
+        }
     }
 
     override suspend fun update(group: DomainGroup) {
-        _group.update { groups -> groups.map { if (it.id == group.id) DataGroup.from(group) else it } }
+        withContext(Dispatchers.IO) {
+            _group.update { groups -> groups.map { if (it.id == group.id) DataGroup.from(group) else it } }
+        }
     }
 
+    override suspend fun getById(id: UUID): DataGroup? {
+        return withContext(Dispatchers.IO) {
+            _group.value.find { group -> group.id == id }
+        }
+    }
+
+    override suspend fun observeById(id: UUID): Flow<DataGroup?> {
+        return groups
+            .map { groups -> groups.find { group -> group.id == id } }
+            .flowOn(Dispatchers.IO)
+    }
 
 }
