@@ -1,5 +1,6 @@
 package sample.gthio.tasks
 
+import SampleRoute
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import sample.gthio.tasks.ui.theme.TasksTheme
+import sample.gthio.tasks.ui.theme.surfaceGray
 import java.util.UUID
 
 class MainActivity : ComponentActivity() {
@@ -19,8 +21,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             TasksTheme {
                 // A surface container using the 'background' color from the theme
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    Greeting("Android")
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = surfaceGray,
+                ) {
+                    SampleRoute()
                 }
             }
         }

@@ -26,5 +26,4 @@ fun defaultTagRepository(tagSource: TagLocalSource): TagRepository = object : Ta
         tagSource.update(tag)
     }
 
-
 }
