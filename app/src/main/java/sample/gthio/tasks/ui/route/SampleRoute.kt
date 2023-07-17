@@ -1,3 +1,4 @@
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -16,8 +17,11 @@ fun SampleRoute() {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            TaskAppBar(
-                title = { Text(text = "This is an appbar") }
+            TaskCenterAppBar(
+                title = { Text(text = "This is an appbar") },
+                navigationIcon = {
+                    // TODO: Add Placeholder image here
+                }
             )
         },
         containerColor = surfaceGray,
@@ -25,8 +29,9 @@ fun SampleRoute() {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(innerPadding)
+                .background(surfaceGray),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             items(200) {
                 Text(text = "Sample Route")
