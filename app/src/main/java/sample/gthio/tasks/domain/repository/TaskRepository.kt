@@ -10,4 +10,6 @@ interface TaskRepository {
     suspend fun insertTask(task: DomainTask)
     
     suspend fun deleteTaskById(uuid: UUID)
+
+    suspend fun updateTask(task: DomainTask)
 }
