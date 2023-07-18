@@ -85,7 +85,7 @@ fun SampleRoute(
                 uiState = uiState,
                 onEvent = viewModel::onEvent
             )
-            homeGroups(groups = viewModel.groups)
+            homeGroups(uiState = uiState)
         }
     }
 }

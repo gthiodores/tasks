@@ -16,10 +16,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import sample.gthio.tasks.domain.model.DomainGroup
+import sample.gthio.tasks.ui.model.UiGroup
 
 fun LazyListScope.homeGroups(
-    groups: List<DomainGroup>
+    uiState: HomeState
 ) {
     item {
         Row(
@@ -34,7 +34,7 @@ fun LazyListScope.homeGroups(
             }
         }
     }
-    items(groups) { group ->
+    items(uiState.uiGroups) { group ->
         HomeGroupItem(group = group)
     }
 }
@@ -42,7 +42,7 @@ fun LazyListScope.homeGroups(
 @Composable
 fun HomeGroupItem(
     modifier: Modifier = Modifier,
-    group: DomainGroup,
+    group: UiGroup,
 ) {
     Row(
         modifier = modifier
@@ -53,12 +53,12 @@ fun HomeGroupItem(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Icon(Icons.Default.Home, contentDescription = "group icon")
-            Text(text = group.title)
+            Text(text = group.group.title)
         }
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(text = "0")
+            Text(text = group.quantity.toString())
             Icon(Icons.Default.KeyboardArrowRight, contentDescription = "to group route icon")
         }
     }
