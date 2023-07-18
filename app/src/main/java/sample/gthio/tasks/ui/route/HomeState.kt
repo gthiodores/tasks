@@ -3,7 +3,7 @@ package sample.gthio.tasks.ui.route
 import sample.gthio.tasks.domain.model.DomainTag
 import sample.gthio.tasks.ui.model.UiGroup
 
-data class SampleRouteState(
+data class HomeState(
     val tags: List<DomainTag> = emptyList(),
     val selectedTag: DomainTag? = null,
     val groups: List<UiGroup> = emptyList(),

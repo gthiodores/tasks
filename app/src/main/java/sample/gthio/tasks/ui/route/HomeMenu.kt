@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -105,15 +106,24 @@ fun HomeMenuGrid(
                     .clip(CircleShape)
                     .background(surfaceGray)
                     .align(Alignment.TopStart),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     Icons.Default.Add,
-                    contentDescription = "grid menu icon"
+                    contentDescription = "grid menu icon",
                 )
             }
-            Text(modifier = Modifier.align(Alignment.TopEnd), text = quantity.toString())
-            Text(modifier = Modifier.align(Alignment.BottomEnd), text = name)
+            Text(
+                modifier = Modifier
+                    .align(Alignment.TopEnd),
+                text = quantity.toString(),
+                style = MaterialTheme.typography.displaySmall,
+            )
+            Text(
+                modifier = Modifier.align(Alignment.BottomEnd),
+                text = name,
+                style = MaterialTheme.typography.titleSmall
+            )
         }
     }
 }
