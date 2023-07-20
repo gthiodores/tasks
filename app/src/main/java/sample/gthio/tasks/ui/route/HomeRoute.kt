@@ -1,13 +1,9 @@
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
@@ -20,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import sample.gthio.tasks.R
@@ -43,19 +38,12 @@ fun SampleRoute(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TaskAppBar(
-                title = { Text(text = "Hi, Username", style = MaterialTheme.typography.headlineMedium) },
-                navigationIcon = {
-                    Image(
-                        modifier = Modifier
-                            .size(32.dp)
-                            .clip(CircleShape),
-                        painter = painterResource(id = R.drawable.ic_launcher_background),
-                        contentDescription = "user photo",
-                    )
+                title = {
+                    Text(text = "Hi, Username", style = MaterialTheme.typography.headlineSmall)
                 },
                 actions = {
                     IconButton(onClick = {  TODO("Implement Home Menu Button") }) {
-                        Icon(Icons.Default.Menu, contentDescription = "home menu")
+                        Icon(painterResource(id = R.drawable.baseline_more_vert_24), contentDescription = "home menu")
                     }
                 }
             )

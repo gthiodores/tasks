@@ -24,9 +24,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import sample.gthio.tasks.domain.model.DomainTag
+import sample.gthio.tasks.ui.theme.chipBlue
+import sample.gthio.tasks.ui.theme.chipGray
 import sample.gthio.tasks.ui.theme.containerWhite
-import sample.gthio.tasks.ui.theme.surfaceGray
-import sample.gthio.tasks.ui.theme.textBlack
+import sample.gthio.tasks.ui.theme.textGray
 
 @OptIn(ExperimentalLayoutApi::class)
 fun LazyListScope.homeTags(
@@ -82,15 +83,15 @@ fun HomeTagChip(
     Box(
         modifier = modifier
             .clip(CircleShape)
-            .background(if (isSelected) textBlack else surfaceGray)
+            .background(if (isSelected) chipBlue else chipGray)
             .clickable { onClick() },
         contentAlignment = Alignment.Center,
     ) {
         Text(
             modifier = Modifier
-                .padding(horizontal = 8.dp, vertical = 4.dp),
+                .padding(horizontal = 12.dp, vertical = 4.dp),
             text = name,
-            color = if (isSelected) containerWhite else textBlack
+            color = if (isSelected) containerWhite else textGray
         )
     }
 }

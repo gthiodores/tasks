@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,9 +20,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import sample.gthio.tasks.ui.theme.containerWhite
+import sample.gthio.tasks.R
+import sample.gthio.tasks.ui.theme.allTaskContainer
+import sample.gthio.tasks.ui.theme.allTaskIcon
+import sample.gthio.tasks.ui.theme.importantContainer
+import sample.gthio.tasks.ui.theme.importantIcon
+import sample.gthio.tasks.ui.theme.scheduledContainer
+import sample.gthio.tasks.ui.theme.scheduledIcon
 import sample.gthio.tasks.ui.theme.surfaceGray
+import sample.gthio.tasks.ui.theme.textGray
+import sample.gthio.tasks.ui.theme.todayContainer
+import sample.gthio.tasks.ui.theme.todayIcon
 
 @Composable
 fun HomeMenu(
@@ -44,15 +52,17 @@ fun HomeMenu(
             HomeMenuGrid(
                 name = "Schedules",
                 quantity = 0,
-                icon = 0,
-                color = containerWhite,
+                icon = R.drawable.baseline_description_24,
+                iconColor = scheduledIcon,
+                containerColor = scheduledContainer,
                 isLarge = true,
             )
             HomeMenuGrid(
                 name = "Important",
                 quantity = 0,
-                icon = 0,
-                color = containerWhite,
+                icon = R.drawable.baseline_star_24,
+                iconColor = importantIcon,
+                containerColor = importantContainer,
                 isLarge = false,
             )
         }
@@ -64,15 +74,17 @@ fun HomeMenu(
             HomeMenuGrid(
                 name = "Today",
                 quantity = 0,
-                icon = 0,
-                color = containerWhite,
+                icon = R.drawable.baseline_calendar_today_24,
+                iconColor = todayIcon,
+                containerColor = todayContainer,
                 isLarge = false,
             )
             HomeMenuGrid(
                 name = "All Tasks",
                 quantity = 0,
-                icon = 0,
-                color = containerWhite,
+                icon = R.drawable.baseline_folder_open_24,
+                iconColor = allTaskIcon,
+                containerColor = allTaskContainer,
                 isLarge = true,
             )
         }
@@ -85,7 +97,8 @@ fun HomeMenuGrid(
     name: String,
     quantity: Int,
     icon: Int,
-    color: Color,
+    iconColor: Color,
+    containerColor: Color,
     isLarge: Boolean,
 ) {
     Box(
@@ -93,7 +106,7 @@ fun HomeMenuGrid(
             .height(if (isLarge) 150.dp else 100.dp)
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(color)
+            .background(containerColor)
     ) {
         Box(
             modifier = Modifier
@@ -109,7 +122,8 @@ fun HomeMenuGrid(
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
-                    Icons.Default.Add,
+                    painter = painterResource(id = icon),
+                    tint = iconColor,
                     contentDescription = "grid menu icon",
                 )
             }
@@ -122,7 +136,8 @@ fun HomeMenuGrid(
             Text(
                 modifier = Modifier.align(Alignment.BottomEnd),
                 text = name,
-                style = MaterialTheme.typography.titleSmall
+                color = textGray,
+                style = MaterialTheme.typography.titleMedium
             )
         }
     }
