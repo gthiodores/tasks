@@ -1,4 +1,4 @@
-package sample.gthio.tasks.ui.route
+package sample.gthio.tasks.ui.route.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

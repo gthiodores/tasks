@@ -1,3 +1,6 @@
+package sample.gthio.tasks.ui.route.home
+
+import TaskAppBar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -18,20 +21,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import sample.gthio.tasks.R
-import sample.gthio.tasks.ui.route.HomeEvent
-import sample.gthio.tasks.ui.route.HomeMenu
-import sample.gthio.tasks.ui.route.HomeViewModel
-import sample.gthio.tasks.ui.route.homeGroups
-import sample.gthio.tasks.ui.route.homeTags
 import sample.gthio.tasks.ui.theme.containerWhite
 import sample.gthio.tasks.ui.theme.surfaceGray
 import sample.gthio.tasks.ui.theme.textBlack
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SampleRoute(
-    viewModel: HomeViewModel
+fun HomeRoute(
+    viewModel: HomeViewModel = hiltViewModel(),
+    toAddTask: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val tasks by viewModel.tasks.collectAsState(initial = emptyList())
@@ -47,7 +47,10 @@ fun SampleRoute(
                 },
                 actions = {
                     IconButton(onClick = { TODO("Implement Home Menu Button") }) {
-                        Icon(painterResource(id = R.drawable.baseline_more_vert_24), contentDescription = "home menu")
+                        Icon(
+                            painterResource(id = R.drawable.baseline_more_vert_24),
+                            contentDescription = "home menu"
+                        )
                     }
                 }
             )
@@ -56,7 +59,10 @@ fun SampleRoute(
             FloatingActionButton(
                 containerColor = textBlack,
                 contentColor = containerWhite,
-                onClick = { viewModel.onEvent(HomeEvent.FabClick) }
+                onClick = {
+                    viewModel.onEvent(HomeEvent.FabClick)
+//                    toAddTask()
+                }
             ) {
                 Icon(Icons.Default.Add, contentDescription = "add task")
             }
