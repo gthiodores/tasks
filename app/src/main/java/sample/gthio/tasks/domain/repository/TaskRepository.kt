@@ -1,7 +1,7 @@
 package sample.gthio.tasks.domain.repository
 
-import sample.gthio.tasks.domain.model.DomainTask
 import kotlinx.coroutines.flow.Flow
+import sample.gthio.tasks.domain.model.DomainTask
 import java.util.UUID
 
 interface TaskRepository {
@@ -12,4 +12,6 @@ interface TaskRepository {
     suspend fun deleteTaskById(uuid: UUID)
 
     suspend fun updateTask(task: DomainTask)
+
+    fun getTaskByTagId(id: UUID): Flow<List<DomainTask>>
 }
