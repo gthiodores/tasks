@@ -34,7 +34,7 @@ import sample.gthio.tasks.ui.theme.textGray
 
 @OptIn(ExperimentalLayoutApi::class)
 fun LazyListScope.homeTags(
-    uiState: HomeState,
+    uiState: HomeUiState,
     onEvent: (HomeEvent) -> Unit,
 ) {
     item {

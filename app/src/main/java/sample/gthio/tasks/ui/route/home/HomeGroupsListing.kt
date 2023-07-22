@@ -28,7 +28,7 @@ import sample.gthio.tasks.ui.model.UiGroup
 import sample.gthio.tasks.ui.theme.containerWhite
 
 fun LazyListScope.homeGroups(
-    uiState: HomeState,
+    uiState: HomeUiState,
     onEvent: (HomeEvent) -> Unit
 ) {
     item {

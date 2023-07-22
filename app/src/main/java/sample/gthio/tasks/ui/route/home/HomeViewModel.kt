@@ -3,31 +3,36 @@ package sample.gthio.tasks.ui.route.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import sample.gthio.tasks.domain.model.DomainGroup
 import sample.gthio.tasks.domain.model.DomainTag
 import sample.gthio.tasks.domain.model.DomainTask
-import sample.gthio.tasks.domain.usecase.GetAllGroupsUseCase
-import sample.gthio.tasks.domain.usecase.GetAllTagsUseCase
-import sample.gthio.tasks.domain.usecase.GetAllTasksUseCase
-import sample.gthio.tasks.domain.usecase.GetTaskByTagUseCase
+import sample.gthio.tasks.domain.usecase.ObserveAllGroupUseCase
+import sample.gthio.tasks.domain.usecase.ObserveAllTagUseCase
+import sample.gthio.tasks.domain.usecase.ObserveAllTaskUseCase
+import sample.gthio.tasks.domain.usecase.ObserveTaskByTagUseCase
 import sample.gthio.tasks.domain.usecase.UpsertGroupUseCase
 import sample.gthio.tasks.domain.usecase.UpsertTagUseCase
 import sample.gthio.tasks.domain.usecase.UpsertTaskUseCase
 import java.util.UUID
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val getAllTask: GetAllTasksUseCase,
-    private val getTaskByTag: GetTaskByTagUseCase,
-    private val getAllGroup: GetAllGroupsUseCase,
-    private val getAllTag: GetAllTagsUseCase,
+    private val observeAllTask: ObserveAllTaskUseCase,
+    private val observeTaskByTag: ObserveTaskByTagUseCase,
+    private val observeAllGroup: ObserveAllGroupUseCase,
+    private val observeAllTag: ObserveAllTagUseCase,
     private val upsertTag: UpsertTagUseCase,
     private val upsertGroup: UpsertGroupUseCase,
     private val upsertTask: UpsertTaskUseCase,
@@ -36,18 +41,39 @@ class HomeViewModel @Inject constructor(
     private val _navigation = MutableStateFlow<HomeNavigationTarget?>(null)
     val navigationTarget = _navigation.asStateFlow()
 
-    private val _state = MutableStateFlow(HomeState())
-    val uiState = _state.asStateFlow()
+    private val _inputState = MutableStateFlow(HomeInputState())
 
-    val tasks = getAllTask()
-        .onEach { tasks -> _state.update { old -> old.copy(tasks = tasks) } }
+    private val _tasks = _inputState
+        .flatMapLatest { input ->
+            when (val tag = input.selectedTagId) {
+                null -> observeAllTask()
+                else -> observeTaskByTag(tag)
+            }
+        }
 
-    val groups = getAllGroup()
-        .onEach { groups -> _state.update { old -> old.copy(groups = groups) } }
+    private val _groups = observeAllGroup()
 
-    val tags = getAllTag()
-        .onEach { tags -> _state.update { old -> old.copy(tags = tags) } }
+    private val _tags = observeAllTag()
 
+    val uiState = combine(
+        _tasks,
+        _groups,
+        _tags,
+        _inputState
+    ) { tasks, groups, tags, inputState ->
+        HomeUiState(
+            tasks = tasks,
+            groups = groups,
+            tags = tags,
+            selectedTag = inputState
+                .selectedTagId
+                ?.let { id -> tags.firstOrNull { tag -> tag.id == id } }
+        )
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        HomeUiState()
+    )
     fun onEvent(event: HomeEvent) {
         when (event) {
             is HomeEvent.SelectAllTags -> handleSelectAllTag()
@@ -58,21 +84,11 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun handleSelectAllTag() {
-        viewModelScope.launch {
-            val tasks = getAllTask().first()
-            _state.update { old ->
-                old.copy(selectedTag = null, tasks = tasks)
-            }
-        }
+        _inputState.update { old -> old.copy(selectedTagId = null) }
     }
 
     private fun handleSelectTag(tag: DomainTag) {
-        viewModelScope.launch {
-            val tasks = getTaskByTag(tag.id).first()
-            _state.update { old ->
-                old.copy(selectedTag = tag, tasks = tasks)
-            }
-        }
+        _inputState.update { old -> old.copy(selectedTagId = tag.id) }
     }
 
     private fun handleFabClick() {
@@ -80,7 +96,7 @@ class HomeViewModel @Inject constructor(
             val random = UUID.randomUUID().toString().split("-")
             val tag = DomainTag(title = random[0])
             upsertTag(tag)
-            upsertTask(DomainTask(title = random[1], group = groups.first().last(), tags = listOf(tag)))
+            upsertTask(DomainTask(title = random[1], group = _groups.first().last(), tags = listOf(tag)))
         }
 //        _navigation.update { HomeNavigationTarget.AddTask }
     }

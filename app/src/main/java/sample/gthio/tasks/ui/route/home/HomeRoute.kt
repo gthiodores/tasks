@@ -37,9 +37,6 @@ fun HomeRoute(
     val navigation by viewModel.navigationTarget.collectAsState()
 
     val uiState by viewModel.uiState.collectAsState()
-    val tasks by viewModel.tasks.collectAsState(initial = emptyList())
-    val tags by viewModel.tags.collectAsState(initial = emptyList())
-    val groups by viewModel.groups.collectAsState(initial = emptyList())
 
     LaunchedEffect(key1 = navigation) {
         navigation?.let { target ->
