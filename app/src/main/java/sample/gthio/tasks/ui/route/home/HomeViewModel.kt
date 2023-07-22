@@ -30,6 +30,9 @@ class HomeViewModel @Inject constructor(
     private val upsertGroup: UpsertGroupUseCase,
 ) : ViewModel() {
 
+    private val _navigation = MutableStateFlow<HomeNavigationTarget?>(null)
+    val navigationTarget = _navigation.asStateFlow()
+
     private val _state = MutableStateFlow(HomeState())
     val uiState = _state.asStateFlow()
 
@@ -73,6 +76,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             upsertTag(DomainTag(title = UUID.randomUUID().toString().split("-")[0]))
         }
+//        _navigation.update { HomeNavigationTarget.AddTask }
     }
 
     private fun handleAddClick() {

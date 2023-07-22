@@ -16,6 +16,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -33,10 +34,20 @@ fun HomeRoute(
     viewModel: HomeViewModel = hiltViewModel(),
     toAddTask: () -> Unit,
 ) {
+    val navigation by viewModel.navigationTarget.collectAsState()
+
     val uiState by viewModel.uiState.collectAsState()
     val tasks by viewModel.tasks.collectAsState(initial = emptyList())
     val tags by viewModel.tags.collectAsState(initial = emptyList())
     val groups by viewModel.groups.collectAsState(initial = emptyList())
+
+    LaunchedEffect(key1 = navigation) {
+        navigation?.let { target ->
+            when (target) {
+                is HomeNavigationTarget.AddTask -> toAddTask()
+            }
+        }
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
