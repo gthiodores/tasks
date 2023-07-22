@@ -1,6 +1,8 @@
-package sample.gthio.tasks.ui.route
+package sample.gthio.tasks.ui.route.home
 
-import android.util.Log
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,11 +21,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import sample.gthio.tasks.domain.model.DomainTag
 import sample.gthio.tasks.ui.theme.chipBlue
 import sample.gthio.tasks.ui.theme.chipGray
 import sample.gthio.tasks.ui.theme.containerWhite
@@ -31,7 +34,6 @@ import sample.gthio.tasks.ui.theme.textGray
 
 @OptIn(ExperimentalLayoutApi::class)
 fun LazyListScope.homeTags(
-    tags: List<DomainTag>,
     uiState: HomeState,
     onEvent: (HomeEvent) -> Unit,
 ) {
@@ -60,9 +62,7 @@ fun LazyListScope.homeTags(
                 isSelected = uiState.selectedTag == null,
                 onClick = { onEvent(HomeEvent.SelectAllTags) },
             )
-            tags.forEach { tag ->
-                Log.d("Tags", uiState.selectedTag.toString())
-                Log.d("Tags", tag.toString())
+            uiState.tags.forEach { tag ->
                 HomeTagChip(
                     name = "#${tag.title}",
                     isSelected = uiState.selectedTag?.id == tag.id,
@@ -80,10 +80,15 @@ fun HomeTagChip(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
+    val containerColor: Color by animateColorAsState(
+        targetValue = if (isSelected) chipBlue else chipGray,
+        animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
+    )
+
     Box(
         modifier = modifier
             .clip(CircleShape)
-            .background(if (isSelected) chipBlue else chipGray)
+            .background(containerColor)
             .clickable { onClick() },
         contentAlignment = Alignment.Center,
     ) {

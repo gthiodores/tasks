@@ -5,7 +5,7 @@ import sample.gthio.tasks.domain.model.DomainGroup
 import sample.gthio.tasks.domain.repository.GroupRepository
 import sample.gthio.tasks.domain.repository.TaskRepository
 
-class UpsertGroupUsecase(
+class UpsertGroupUseCase(
     private val groupRepository: GroupRepository,
     private val taskRepository: TaskRepository
 ) {

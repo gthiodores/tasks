@@ -3,6 +3,7 @@ package sample.gthio.tasks.data.model
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import sample.gthio.tasks.domain.model.DomainTask
 import java.util.*
 
@@ -15,14 +16,15 @@ data class DataTask(
     val isImportant: Boolean = false,
     val group: DataGroup
 ) {
-    fun toDomain(): DataTask = DataTask(
+    fun toDomain(): DomainTask = DomainTask(
         id = id,
         title = title,
         description = description,
-        timestamp = timestamp,
-        tags = tags,
+        date = timestamp.toInstant().toLocalDateTime(TimeZone.currentSystemDefault()).date,
+        time = timestamp.toInstant().toLocalDateTime(TimeZone.currentSystemDefault()).time,
+        tags = tags.map { tag -> tag.toDomain() },
         isImportant = isImportant,
-        group = group
+        group = group.toDomain()
     )
 
     companion object {
