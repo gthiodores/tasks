@@ -11,12 +11,14 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import sample.gthio.tasks.domain.model.DomainGroup
 import sample.gthio.tasks.domain.model.DomainTag
+import sample.gthio.tasks.domain.model.DomainTask
 import sample.gthio.tasks.domain.usecase.GetAllGroupsUseCase
 import sample.gthio.tasks.domain.usecase.GetAllTagsUseCase
 import sample.gthio.tasks.domain.usecase.GetAllTasksUseCase
 import sample.gthio.tasks.domain.usecase.GetTaskByTagUseCase
 import sample.gthio.tasks.domain.usecase.UpsertGroupUseCase
 import sample.gthio.tasks.domain.usecase.UpsertTagUseCase
+import sample.gthio.tasks.domain.usecase.UpsertTaskUseCase
 import java.util.UUID
 import javax.inject.Inject
 
@@ -28,6 +30,7 @@ class HomeViewModel @Inject constructor(
     private val getAllTag: GetAllTagsUseCase,
     private val upsertTag: UpsertTagUseCase,
     private val upsertGroup: UpsertGroupUseCase,
+    private val upsertTask: UpsertTaskUseCase,
 ) : ViewModel() {
 
     private val _navigation = MutableStateFlow<HomeNavigationTarget?>(null)
@@ -74,7 +77,10 @@ class HomeViewModel @Inject constructor(
 
     private fun handleFabClick() {
         viewModelScope.launch {
-            upsertTag(DomainTag(title = UUID.randomUUID().toString().split("-")[0]))
+            val random = UUID.randomUUID().toString().split("-")
+            val tag = DomainTag(title = random[0])
+            upsertTag(tag)
+            upsertTask(DomainTask(title = random[1], group = groups.first().last(), tags = listOf(tag)))
         }
 //        _navigation.update { HomeNavigationTarget.AddTask }
     }
