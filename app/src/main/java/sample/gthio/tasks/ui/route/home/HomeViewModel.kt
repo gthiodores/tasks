@@ -31,8 +31,8 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val observeAllTask: ObserveAllTaskUseCase,
     private val observeTaskByTag: ObserveTaskByTagUseCase,
-    private val observeAllGroup: ObserveAllGroupUseCase,
-    private val observeAllTag: ObserveAllTagUseCase,
+    observeAllGroup: ObserveAllGroupUseCase,
+    observeAllTag: ObserveAllTagUseCase,
     private val upsertTag: UpsertTagUseCase,
     private val upsertGroup: UpsertGroupUseCase,
     private val upsertTask: UpsertTaskUseCase,

@@ -9,6 +9,6 @@ class ObserveTaskByTagUseCase(
     private val taskRepository: TaskRepository
 ) {
     operator fun invoke(tagId: UUID): Flow<List<DomainTask>> {
-        return taskRepository.getTaskByTagId(tagId)
+        return taskRepository.observeTaskByTagId(tagId)
     }
 }

@@ -13,5 +13,5 @@ interface TaskRepository {
 
     suspend fun updateTask(task: DomainTask)
 
-    fun getTaskByTagId(id: UUID): Flow<List<DomainTask>>
+    fun observeTaskByTagId(id: UUID): Flow<List<DomainTask>>
 }

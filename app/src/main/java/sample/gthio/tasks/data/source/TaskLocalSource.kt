@@ -20,7 +20,7 @@ interface TaskLocalSource {
 
     suspend fun update(task: DomainTask)
 
-    fun getTaskByTagId(id: UUID): Flow<List<DataTask>>
+    fun observeTaskByTagId(id: UUID): Flow<List<DataTask>>
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -40,7 +40,7 @@ fun inMemoryTaskSource(): TaskLocalSource = object : TaskLocalSource {
         _task.update { tasks -> tasks.map { if (it.id == task.id) DataTask.from(task) else it } }
     }
 
-    override fun getTaskByTagId(id: UUID): Flow<List<DataTask>> {
+    override fun observeTaskByTagId(id: UUID): Flow<List<DataTask>> {
         val tasksWithTag = tasks
             .flatMapLatest { tasks ->
                 flowOf(tasks.filter { task -> task.tags.any { tag -> tag.id == id } })
