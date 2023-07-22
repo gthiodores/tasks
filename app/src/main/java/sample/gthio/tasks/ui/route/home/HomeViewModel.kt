@@ -23,6 +23,7 @@ import sample.gthio.tasks.domain.usecase.ObserveTaskByTagUseCase
 import sample.gthio.tasks.domain.usecase.UpsertGroupUseCase
 import sample.gthio.tasks.domain.usecase.UpsertTagUseCase
 import sample.gthio.tasks.domain.usecase.UpsertTaskUseCase
+import sample.gthio.tasks.ui.model.UiGroup
 import java.util.UUID
 import javax.inject.Inject
 
@@ -63,7 +64,13 @@ class HomeViewModel @Inject constructor(
     ) { tasks, groups, tags, inputState ->
         HomeUiState(
             tasks = tasks,
-            groups = groups,
+            groups = groups
+                .map { group ->
+                    UiGroup(
+                        group = group,
+                        quantity = tasks.count { task -> task.group == group }
+                    )
+                },
             tags = tags,
             selectedTag = inputState
                 .selectedTagId
@@ -74,6 +81,7 @@ class HomeViewModel @Inject constructor(
         SharingStarted.WhileSubscribed(5_000),
         HomeUiState()
     )
+
     fun onEvent(event: HomeEvent) {
         when (event) {
             is HomeEvent.SelectAllTags -> handleSelectAllTag()

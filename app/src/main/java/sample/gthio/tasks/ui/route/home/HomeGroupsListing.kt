@@ -45,15 +45,15 @@ fun LazyListScope.homeGroups(
             }
         }
     }
-    itemsIndexed(uiState.uiGroups) { index, group ->
+    itemsIndexed(uiState.groups) { index, group ->
         HomeGroupItem(
             modifier = Modifier
                 .clip(
                     RoundedCornerShape(
                         topStart = if (index == 0) 20.dp else 0.dp,
                         topEnd = if (index == 0) 20.dp else 0.dp,
-                        bottomStart = if (index == uiState.uiGroups.lastIndex) 20.dp else 0.dp,
-                        bottomEnd = if (index == uiState.uiGroups.lastIndex) 20.dp else 0.dp,
+                        bottomStart = if (index == uiState.groups.lastIndex) 20.dp else 0.dp,
+                        bottomEnd = if (index == uiState.groups.lastIndex) 20.dp else 0.dp,
                     )
                 )
                 .background(containerWhite),
