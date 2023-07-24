@@ -33,7 +33,7 @@ import sample.gthio.tasks.ui.theme.containerWhite
 import sample.gthio.tasks.ui.theme.textGray
 
 @OptIn(ExperimentalLayoutApi::class)
-fun LazyListScope.homeTags(
+fun LazyListScope.homeTagsChipGroup(
     uiState: HomeUiState,
     onEvent: (HomeEvent) -> Unit,
 ) {

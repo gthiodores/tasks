@@ -86,7 +86,7 @@ fun HomeRoute(
                 .background(surfaceGray),
         ) {
             item { HomeMenu() }
-            homeTags(
+            homeTagsChipGroup(
                 uiState = uiState,
                 onEvent = viewModel::onEvent
             )

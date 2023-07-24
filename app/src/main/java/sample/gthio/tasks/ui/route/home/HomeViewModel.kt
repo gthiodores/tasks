@@ -8,14 +8,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import sample.gthio.tasks.domain.model.DomainGroup
 import sample.gthio.tasks.domain.model.DomainTag
-import sample.gthio.tasks.domain.model.DomainTask
 import sample.gthio.tasks.domain.usecase.ObserveAllGroupUseCase
 import sample.gthio.tasks.domain.usecase.ObserveAllTagUseCase
 import sample.gthio.tasks.domain.usecase.ObserveAllTaskUseCase
@@ -100,13 +98,13 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun handleFabClick() {
-        viewModelScope.launch {
-            val random = UUID.randomUUID().toString().split("-")
-            val tag = DomainTag(title = random[0])
-            upsertTag(tag)
-            upsertTask(DomainTask(title = random[1], group = _groups.first().last(), tags = listOf(tag)))
-        }
-//        _navigation.update { HomeNavigationTarget.AddTask }
+//        viewModelScope.launch {
+//            val random = UUID.randomUUID().toString().split("-")
+//            val tag = DomainTag(title = random[0])
+//            upsertTag(tag)
+//            upsertTask(DomainTask(title = random[1], group = _groups.first().last(), tags = listOf(tag)))
+//        }
+        _navigation.update { HomeNavigationTarget.AddTask }
     }
 
     private fun handleAddClick() {

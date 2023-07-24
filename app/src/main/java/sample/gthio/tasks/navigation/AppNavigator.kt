@@ -10,20 +10,22 @@ import sample.gthio.tasks.ui.route.home.HomeRoute
 
 @Composable
 fun AppNavigator(
-    controller: NavHostController = rememberNavController(),
+    navController: NavHostController = rememberNavController(),
     startDestination: String = Screen.Home.route,
 ) {
     NavHost(
-        navController = controller,
+        navController = navController,
         startDestination = startDestination,
     ) {
         composable(Screen.Home.route) {
             HomeRoute(
-                toAddTask = { controller.navigate(Screen.AddTask.route) }
+                toAddTask = { navController.navigate(route = Screen.AddTask.route) }
             )
         }
         composable(Screen.AddTask.route) {
-            AddTaskRoute()
+            AddTaskRoute(
+                onBack = { navController.navigateUp() }
+            )
         }
     }
 }
