@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -56,16 +57,16 @@ fun LazyListScope.addTaskInputListing(
             date = uiState.date,
             result = "",
             onDateChange = {},
-            isExpanded = true,
-            onClick = {}
+            isExpanded = uiState.isDateOpen,
+            onClick = { onEvent(AddTaskEvent.OpenDate) },
         )
         AddTaskInputTime(
             modifier = Modifier,
             time = uiState.time,
             result = "",
             onTimeChange = {},
-            onClick = {},
-            isExpanded = false
+            isExpanded = false,
+            onClick = { }
         )
         AddTaskInputTags(
             modifier = Modifier,
@@ -76,8 +77,8 @@ fun LazyListScope.addTaskInputListing(
             onTagSelected = { tag -> onEvent(AddTaskEvent.TagSelect(tag)) },
             onNewTagValueChange = { newTag -> onEvent(AddTaskEvent.NewTagValueChange(newTag)) },
             onNewTagAddButtonClick = { newTag -> onEvent(AddTaskEvent.NewTagAddButtonClick(newTag)) },
-            isExpanded = true,
-            onClick = {}
+            isExpanded = uiState.isTagOpen,
+            onClick = { onEvent(AddTaskEvent.OpenTag) },
         )
         AddTaskMarkAsImportantToggle(
             modifier = Modifier
@@ -94,8 +95,8 @@ fun AddTaskInputContainerExpanded(
     iconId: Int,
     title: String,
     result: String,
-    onClick: () -> Unit,
     isExpanded: Boolean,
+    onClick: () -> Unit,
     content: @Composable () -> Unit,
 ) {
     Column(
@@ -107,11 +108,17 @@ fun AddTaskInputContainerExpanded(
             iconId = iconId,
             title = title,
             result = result,
-            onClick = onClick,
             isExpanded = isExpanded,
+            onClick = onClick
         )
         if (isExpanded) {
             content()
+            Divider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+                    .background(surfaceGray)
+            )
         }
     }
 }
@@ -122,15 +129,15 @@ fun AddTaskInputContainer(
     iconId: Int,
     title: String,
     result: String,
-    onClick: () -> Unit,
     isExpanded: Boolean,
+    onClick: () -> Unit,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .background(containerWhite)
-            .padding(16.dp)
-            .clickable { onClick() },
+            .clickable { onClick() }
+            .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(
@@ -174,7 +181,7 @@ fun AddTaskInputDate(
     result: String,
     onDateChange: (LocalDate) -> Unit,
     isExpanded: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     AddTaskInputContainerExpanded(
         modifier = modifier,
@@ -182,7 +189,7 @@ fun AddTaskInputDate(
         title = "Date",
         result = result,
         isExpanded = isExpanded,
-        onClick = onClick
+        onClick = onClick,
     ) {
         val datePickerState = rememberDatePickerState(
             initialSelectedDateMillis = date
@@ -202,16 +209,16 @@ fun AddTaskInputTime(
     time: LocalTime,
     result: String,
     onTimeChange: (LocalTime) -> Unit,
-    onClick: () -> Unit,
-    isExpanded: Boolean
+    isExpanded: Boolean,
+    onClick: () -> Unit
 ) {
     AddTaskInputContainer(
         modifier = modifier,
         iconId = R.drawable.baseline_access_time_filled_24,
         title = "Time",
         result = result,
-        onClick = onClick,
-        isExpanded = isExpanded
+        isExpanded = isExpanded,
+        onClick = onClick
     )
 }
 
@@ -227,7 +234,7 @@ fun AddTaskInputTags(
     onNewTagValueChange: (String) -> Unit,
     onNewTagAddButtonClick: (String) -> Unit,
     isExpanded: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     AddTaskInputContainerExpanded(
         modifier = modifier,
@@ -235,7 +242,7 @@ fun AddTaskInputTags(
         title = "Tags",
         result = result,
         isExpanded = isExpanded,
-        onClick = onClick
+        onClick = onClick,
     ) {
         Column(
             modifier = Modifier

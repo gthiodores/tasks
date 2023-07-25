@@ -2,10 +2,12 @@ package sample.gthio.tasks.ui.route.addtask
 
 import TaskCenterAppBar
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -28,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import sample.gthio.tasks.ui.theme.containerWhite
 import sample.gthio.tasks.ui.theme.surfaceGray
+import sample.gthio.tasks.ui.theme.textBlack
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,11 +64,11 @@ fun AddTaskRoute(
                     }
                 }
             )
-        }
+        },
+        containerColor = surfaceGray,
     ) { contentPadding ->
         LazyColumn(
             modifier = Modifier
-                .background(surfaceGray)
                 .padding(contentPadding)
                 .padding(horizontal = 16.dp)
         ) {
@@ -95,6 +98,16 @@ fun AddTaskRoute(
                 uiState = uiState,
                 onEvent = viewModel::onEvent
             )
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    AddTaskSaveButton(onClick = { viewModel.onEvent(AddTaskEvent.SaveButtonClick) })
+                }
+            }
         }
     }
 }
@@ -156,4 +169,20 @@ fun AddTaskDescriptionEditText(
             }
         }
     )
+}
+
+@Composable
+fun AddTaskSaveButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = modifier
+            .size(width = 120.dp, height = 50.dp)
+            .background(color = textBlack, shape = RoundedCornerShape(16.dp))
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        Text(text = "Save", color = containerWhite, style = MaterialTheme.typography.titleMedium)
+    }
 }

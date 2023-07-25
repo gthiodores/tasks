@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import sample.gthio.tasks.domain.model.DomainGroup
 import sample.gthio.tasks.domain.model.DomainTag
+import sample.gthio.tasks.domain.model.DomainTask
 import sample.gthio.tasks.domain.usecase.ObserveAllGroupUseCase
 import sample.gthio.tasks.domain.usecase.ObserveAllTagUseCase
 import sample.gthio.tasks.domain.usecase.UpsertGroupUseCase
@@ -43,6 +44,9 @@ class AddTaskViewModel @Inject constructor(
             is AddTaskEvent.NewTagValueChange -> handleNewTagValueChange(event.newTag)
             is AddTaskEvent.NewTagAddButtonClick -> handleNewTagAddButtonClick(event.newTag)
             is AddTaskEvent.GroupSelect -> handleGroupSelect(event.group)
+            is AddTaskEvent.SaveButtonClick -> handleSaveButtonClick()
+            AddTaskEvent.OpenDate -> handleOpenDate()
+            AddTaskEvent.OpenTag -> handleOpenTag()
         }
     }
 
@@ -80,7 +84,33 @@ class AddTaskViewModel @Inject constructor(
     private fun handleNewTagAddButtonClick(newTag: String) {
         viewModelScope.launch {
             upsertTag(tag = DomainTag(title = newTag))
+            _state.update { old -> old.copy(newTag = "") }
         }
+    }
+
+    private fun handleSaveButtonClick() {
+        viewModelScope.launch {
+            if (_state.value.selectedGroup != null) {
+                upsertTask(
+                    DomainTask(
+                        title = _state.value.title,
+                        description = if (_state.value.description != "") _state.value.description else null,
+                        tags = _state.value.selectedTags,
+                        isImportant = _state.value.isImportant,
+                        group = _state.value.selectedGroup!!,
+                    )
+                )
+                _state.update { old -> old.copy(shouldNavigateBack = true) }
+            }
+        }
+    }
+
+    private fun handleOpenDate() {
+        _state.update { old -> old.copy(isDateOpen = !old.isDateOpen) }
+    }
+
+    private fun handleOpenTag() {
+        _state.update { old -> old.copy(isTagOpen = !old.isTagOpen) }
     }
 
     fun addTaskNavigationDone() { _state.update { old -> old.copy(shouldNavigateBack = false) } }

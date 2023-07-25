@@ -12,4 +12,7 @@ sealed interface AddTaskEvent {
     data class NewTagValueChange(val newTag: String): AddTaskEvent
     data class NewTagAddButtonClick(val newTag: String): AddTaskEvent
     data class GroupSelect(val group: DomainGroup): AddTaskEvent
+    object SaveButtonClick: AddTaskEvent
+    object OpenDate: AddTaskEvent
+    object OpenTag: AddTaskEvent
 }
