@@ -47,6 +47,8 @@ class AddTaskViewModel @Inject constructor(
             is AddTaskEvent.SaveButtonClick -> handleSaveButtonClick()
             AddTaskEvent.OpenDate -> handleOpenDate()
             AddTaskEvent.OpenTag -> handleOpenTag()
+            AddTaskEvent.OpenTime -> handleOpenTime()
+            AddTaskEvent.SaveTime -> handleSaveTime()
         }
     }
 
@@ -111,6 +113,14 @@ class AddTaskViewModel @Inject constructor(
 
     private fun handleOpenTag() {
         _state.update { old -> old.copy(isTagOpen = !old.isTagOpen) }
+    }
+
+    private fun handleOpenTime() {
+        _state.update { old -> old.copy(isTimeOpen = true) }
+    }
+
+    private fun handleSaveTime() {
+        _state.update { old -> old.copy(isTimeOpen = false) }
     }
 
     fun addTaskNavigationDone() { _state.update { old -> old.copy(shouldNavigateBack = false) } }

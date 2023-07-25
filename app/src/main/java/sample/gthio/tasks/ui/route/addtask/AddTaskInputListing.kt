@@ -65,8 +65,8 @@ fun LazyListScope.addTaskInputListing(
             time = uiState.time,
             result = "",
             onTimeChange = {},
-            isExpanded = false,
-            onClick = { }
+            isExpanded = uiState.isTimeOpen,
+            onClick = { onEvent(AddTaskEvent.OpenTime) }
         )
         AddTaskInputTags(
             modifier = Modifier,

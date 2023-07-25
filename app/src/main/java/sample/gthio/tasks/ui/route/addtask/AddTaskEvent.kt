@@ -15,4 +15,6 @@ sealed interface AddTaskEvent {
     object SaveButtonClick: AddTaskEvent
     object OpenDate: AddTaskEvent
     object OpenTag: AddTaskEvent
+    object OpenTime: AddTaskEvent
+    object SaveTime: AddTaskEvent
 }

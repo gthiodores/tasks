@@ -26,6 +26,7 @@ data class AddTaskUiState(
     val newTag: String = "",
     val selectedGroup: DomainGroup? = null,
     val isDateOpen: Boolean = false,
+    val isTimeOpen: Boolean = false,
     val isTagOpen: Boolean = false,
     val shouldNavigateBack: Boolean = false,
 )
