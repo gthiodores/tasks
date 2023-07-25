@@ -6,6 +6,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
@@ -47,6 +48,7 @@ fun LazyListScope.addTaskGroupListing(
             onGroupSelected = { selectedGroup -> onEvent(AddTaskEvent.GroupSelect(selectedGroup)) }
         )
     }
+    item { Spacer(modifier = Modifier.padding(8.dp)) }
 }
 
 @Composable

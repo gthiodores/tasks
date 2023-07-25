@@ -40,7 +40,10 @@ fun AddTaskRoute(
     val tags by viewModel.tags.collectAsState(initial = emptyList())
 
     LaunchedEffect(key1 = uiState.shouldNavigateBack) {
-        if (uiState.shouldNavigateBack) onBack()
+        if (uiState.shouldNavigateBack)  {
+            onBack()
+            viewModel.addTaskNavigationDone()
+        }
     }
 
     Scaffold(
@@ -82,8 +85,16 @@ fun AddTaskRoute(
                     }
                 )
             }
-            addTaskInputListing(tags = tags, uiState = uiState, onEvent = viewModel::onEvent)
-            addTaskGroupListing(groups = groups, uiState = uiState, onEvent = viewModel::onEvent)
+            addTaskInputListing(
+                tags = tags,
+                uiState = uiState,
+                onEvent = viewModel::onEvent
+            )
+            addTaskGroupListing(
+                groups = groups,
+                uiState = uiState,
+                onEvent = viewModel::onEvent
+            )
         }
     }
 }

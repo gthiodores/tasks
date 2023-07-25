@@ -5,6 +5,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,11 +15,17 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,8 +34,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
 import sample.gthio.tasks.R
 import sample.gthio.tasks.domain.model.DomainTag
+import sample.gthio.tasks.ui.component.TagChip
 import sample.gthio.tasks.ui.theme.containerWhite
 import sample.gthio.tasks.ui.theme.surfaceGray
 import sample.gthio.tasks.ui.theme.textGray
@@ -58,10 +69,13 @@ fun LazyListScope.addTaskInputListing(
         )
         AddTaskInputTags(
             modifier = Modifier,
-            tags = uiState.selectedTags,
+            tags = tags,
             result = "",
             selectedTags = uiState.selectedTags,
-            onTagsSelected = {},
+            newTag = uiState.newTag,
+            onTagSelected = { tag -> onEvent(AddTaskEvent.TagSelect(tag)) },
+            onNewTagValueChange = { newTag -> onEvent(AddTaskEvent.NewTagValueChange(newTag)) },
+            onNewTagAddButtonClick = { newTag -> onEvent(AddTaskEvent.NewTagAddButtonClick(newTag)) },
             isExpanded = true,
             onClick = {}
         )
@@ -144,14 +158,15 @@ fun AddTaskInputContainer(
         ) {
             Text(text = result)
             if (isExpanded) {
-                Icon(Icons.Default.KeyboardArrowDown, contentDescription = "expand container icon")
+                Icon(Icons.Default.KeyboardArrowUp, contentDescription = "expand container icon")
             } else {
-                Icon(Icons.Default.KeyboardArrowUp, contentDescription = "close container icon")
+                Icon(Icons.Default.KeyboardArrowDown, contentDescription = "close container icon")
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTaskInputDate(
     modifier: Modifier = Modifier,
@@ -169,7 +184,15 @@ fun AddTaskInputDate(
         isExpanded = isExpanded,
         onClick = onClick
     ) {
-
+        val datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = date
+                .atStartOfDayIn(TimeZone.currentSystemDefault())
+                .toEpochMilliseconds()
+        )
+        DatePicker(
+            state = datePickerState,
+            modifier = Modifier.padding(16.dp)
+        )
     }
 }
 
@@ -192,13 +215,17 @@ fun AddTaskInputTime(
     )
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AddTaskInputTags(
     modifier: Modifier = Modifier,
     tags: List<DomainTag>,
     result: String,
     selectedTags: List<DomainTag>,
-    onTagsSelected: (List<DomainTag>) -> Unit,
+    newTag: String,
+    onTagSelected: (DomainTag) -> Unit,
+    onNewTagValueChange: (String) -> Unit,
+    onNewTagAddButtonClick: (String) -> Unit,
     isExpanded: Boolean,
     onClick: () -> Unit
 ) {
@@ -210,7 +237,41 @@ fun AddTaskInputTags(
         isExpanded = isExpanded,
         onClick = onClick
     ) {
-
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            if (tags.isNotEmpty()) {
+                FlowRow(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    tags.forEach { tag ->
+                        TagChip(
+                            name = "#${tag.title}",
+                            isSelected = selectedTags.any { selectedTag -> selectedTag.id == tag.id },
+                            onClick = { onTagSelected(tag) }
+                        )
+                    }
+                }
+            }
+            OutlinedTextField(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                value = newTag,
+                onValueChange = { newTag -> onNewTagValueChange(newTag) },
+                label = { Text("Add new tag...") },
+                trailingIcon = {
+                    IconButton(onClick = { onNewTagAddButtonClick(newTag) }) {
+                        Icon(Icons.Default.AddCircle, contentDescription = "add new tag")
+                    }
+                }
+            )
+        }
     }
 }
 

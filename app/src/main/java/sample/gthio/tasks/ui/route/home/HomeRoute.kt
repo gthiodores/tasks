@@ -38,10 +38,13 @@ fun HomeRoute(
 
     val uiState by viewModel.uiState.collectAsState()
 
-    LaunchedEffect(key1 = navigation) {
-        navigation?.let { target ->
-            when (target) {
-                is HomeNavigationTarget.AddTask -> toAddTask()
+    if (navigation != null) {
+        LaunchedEffect(key1 = navigation) {
+            navigation?.let { target ->
+                when (target) {
+                    is HomeNavigationTarget.AddTask -> toAddTask()
+                }
+                viewModel.homeNavigationDone()
             }
         }
     }

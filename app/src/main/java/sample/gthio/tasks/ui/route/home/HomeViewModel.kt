@@ -112,4 +112,6 @@ class HomeViewModel @Inject constructor(
             upsertGroup(DomainGroup(title = UUID.randomUUID().toString().split("-")[0]))
         }
     }
+
+    fun homeNavigationDone() { _navigation.update { null } }
 }

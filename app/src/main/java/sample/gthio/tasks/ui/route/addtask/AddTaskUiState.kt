@@ -23,6 +23,7 @@ data class AddTaskUiState(
         .time,
     val isImportant: Boolean = false,
     val selectedTags: List<DomainTag> = emptyList(),
+    val newTag: String = "",
     val selectedGroup: DomainGroup? = null,
     val shouldNavigateBack: Boolean = false,
 )
