@@ -72,7 +72,6 @@ fun HomeRoute(
                 contentColor = containerWhite,
                 onClick = {
                     viewModel.onEvent(HomeEvent.FabClick)
-//                    toAddTask()
                 }
             ) {
                 Icon(Icons.Default.Add, contentDescription = "add task")
