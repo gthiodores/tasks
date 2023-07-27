@@ -1,5 +1,8 @@
 package sample.gthio.tasks.ui.route.addtask
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -100,6 +103,7 @@ fun AddTaskInputContainerExpanded(
     Column(
         modifier = modifier
             .fillMaxWidth()
+            .animateContentSize()
             .background(containerWhite)
     ) {
         AddTaskInputContainer(
@@ -109,14 +113,21 @@ fun AddTaskInputContainerExpanded(
             isExpanded = isExpanded,
             onClick = onClick
         )
-        if (isExpanded) {
-            content()
-            Divider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-                    .background(surfaceGray)
-            )
+        Crossfade(
+            targetState = isExpanded,
+            animationSpec = tween(durationMillis = 200)
+        ) { isExpanded ->
+            if (isExpanded) {
+                Column {
+                    content()
+                    Divider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                            .background(surfaceGray)
+                    )
+                }
+            }
         }
     }
 }
