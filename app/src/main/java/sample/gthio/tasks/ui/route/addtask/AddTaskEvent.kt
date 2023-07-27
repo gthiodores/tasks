@@ -1,5 +1,6 @@
 package sample.gthio.tasks.ui.route.addtask
 
+import kotlinx.datetime.LocalTime
 import sample.gthio.tasks.domain.model.DomainGroup
 import sample.gthio.tasks.domain.model.DomainTag
 
@@ -16,5 +17,6 @@ sealed interface AddTaskEvent {
     object OpenDate: AddTaskEvent
     object OpenTag: AddTaskEvent
     object OpenTime: AddTaskEvent
-    object SaveTime: AddTaskEvent
+    data class SaveTime(val time: LocalTime): AddTaskEvent
+    data class SaveDate(val dateInMillis: Long): AddTaskEvent
 }

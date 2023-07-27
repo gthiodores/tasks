@@ -28,13 +28,13 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import sample.gthio.tasks.R
@@ -56,15 +56,13 @@ fun LazyListScope.addTaskInputListing(
                 .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)),
             date = uiState.date,
             result = "",
-            onDateChange = {},
+            onDateChange = { dateInMillis -> onEvent(AddTaskEvent.SaveDate(dateInMillis))},
             isExpanded = uiState.isDateOpen,
             onClick = { onEvent(AddTaskEvent.OpenDate) },
         )
         AddTaskInputTime(
             modifier = Modifier,
-            time = uiState.time,
             result = "",
-            onTimeChange = {},
             isExpanded = uiState.isTimeOpen,
             onClick = { onEvent(AddTaskEvent.OpenTime) }
         )
@@ -179,7 +177,7 @@ fun AddTaskInputDate(
     modifier: Modifier = Modifier,
     date: LocalDate,
     result: String,
-    onDateChange: (LocalDate) -> Unit,
+    onDateChange: (Long) -> Unit,
     isExpanded: Boolean,
     onClick: () -> Unit,
 ) {
@@ -196,9 +194,13 @@ fun AddTaskInputDate(
                 .atStartOfDayIn(TimeZone.currentSystemDefault())
                 .toEpochMilliseconds()
         )
+        LaunchedEffect(key1 = datePickerState) {
+            if (datePickerState.selectedDateMillis != null) {
+                onDateChange(datePickerState.selectedDateMillis!!)
+            }
+        }
         DatePicker(
             state = datePickerState,
-            modifier = Modifier.padding(16.dp)
         )
     }
 }
@@ -206,9 +208,7 @@ fun AddTaskInputDate(
 @Composable
 fun AddTaskInputTime(
     modifier: Modifier = Modifier,
-    time: LocalTime,
     result: String,
-    onTimeChange: (LocalTime) -> Unit,
     isExpanded: Boolean,
     onClick: () -> Unit
 ) {

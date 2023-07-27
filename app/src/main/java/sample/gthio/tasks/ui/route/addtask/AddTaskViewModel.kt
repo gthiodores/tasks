@@ -7,6 +7,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import sample.gthio.tasks.domain.model.DomainGroup
 import sample.gthio.tasks.domain.model.DomainTag
 import sample.gthio.tasks.domain.model.DomainTask
@@ -48,7 +52,8 @@ class AddTaskViewModel @Inject constructor(
             AddTaskEvent.OpenDate -> handleOpenDate()
             AddTaskEvent.OpenTag -> handleOpenTag()
             AddTaskEvent.OpenTime -> handleOpenTime()
-            AddTaskEvent.SaveTime -> handleSaveTime()
+            is AddTaskEvent.SaveTime -> handleSaveTime(event.time)
+            is AddTaskEvent.SaveDate -> handleSaveDate(event.dateInMillis)
         }
     }
 
@@ -119,8 +124,24 @@ class AddTaskViewModel @Inject constructor(
         _state.update { old -> old.copy(isTimeOpen = true) }
     }
 
-    private fun handleSaveTime() {
-        _state.update { old -> old.copy(isTimeOpen = false) }
+    private fun handleSaveTime(time: LocalTime) {
+        _state.update { old ->
+            old.copy(
+                isTimeOpen = false,
+                time = time,
+            )
+        }
+    }
+
+    private fun handleSaveDate(long: Long) {
+        _state.update { old ->
+            old.copy(
+                date = Instant
+                    .fromEpochMilliseconds(long)
+                    .toLocalDateTime(TimeZone.currentSystemDefault())
+                    .date
+            )
+        }
     }
 
     fun addTaskNavigationDone() { _state.update { old -> old.copy(shouldNavigateBack = false) } }
