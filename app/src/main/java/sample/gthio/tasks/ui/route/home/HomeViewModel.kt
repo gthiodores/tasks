@@ -22,6 +22,8 @@ import sample.gthio.tasks.domain.usecase.UpsertGroupUseCase
 import sample.gthio.tasks.domain.usecase.UpsertTagUseCase
 import sample.gthio.tasks.domain.usecase.UpsertTaskUseCase
 import sample.gthio.tasks.ui.model.UiGroup
+import sample.gthio.tasks.ui.route.addgroup.AddGroupInputState
+import sample.gthio.tasks.ui.route.addgroup.AddGroupUiState
 import java.util.UUID
 import javax.inject.Inject
 
@@ -80,6 +82,22 @@ class HomeViewModel @Inject constructor(
         HomeUiState()
     )
 
+    private val _addGroupInputState = MutableStateFlow(AddGroupInputState())
+
+    val addGroupUiState = combine(
+        _groups,
+        _addGroupInputState
+    ) { groups, inputState ->
+        AddGroupUiState(
+            groups = groups,
+            selectedGroup = inputState.selectedGroup
+        )
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        AddGroupUiState()
+    )
+
     fun onEvent(event: HomeEvent) {
         when (event) {
             is HomeEvent.SelectAllTags -> handleSelectAllTag()
@@ -98,12 +116,6 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun handleFabClick() {
-//        viewModelScope.launch {
-//            val random = UUID.randomUUID().toString().split("-")
-//            val tag = DomainTag(title = random[0])
-//            upsertTag(tag)
-//            upsertTask(DomainTask(title = random[1], group = _groups.first().last(), tags = listOf(tag)))
-//        }
         _navigation.update { HomeNavigationTarget.AddTask }
     }
 
