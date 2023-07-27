@@ -19,4 +19,5 @@ sealed interface AddTaskEvent {
     object OpenTime: AddTaskEvent
     data class SaveTime(val time: LocalTime): AddTaskEvent
     data class SaveDate(val dateInMillis: Long): AddTaskEvent
+    object DismissTime: AddTaskEvent
 }

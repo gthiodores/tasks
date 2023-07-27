@@ -292,8 +292,7 @@ fun AddTaskMarkAsImportantToggle(
         modifier = modifier
             .fillMaxWidth()
             .background(containerWhite)
-            .padding(16.dp)
-            .clickable { onClick() },
+            .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(
