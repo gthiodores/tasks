@@ -1,4 +1,4 @@
-package sample.gthio.tasks.ui.route.home
+package sample.gthio.tasks.ui.route.addtask
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -11,12 +11,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -24,48 +21,51 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import sample.gthio.tasks.ui.model.UiGroup
+import sample.gthio.tasks.domain.model.DomainGroup
 import sample.gthio.tasks.ui.theme.containerWhite
 
-fun LazyListScope.homeGroups(
-    uiState: HomeUiState,
-    onEvent: (HomeEvent) -> Unit
+fun LazyListScope.addTaskGroupListing(
+    groups: List<DomainGroup>,
+    uiState: AddTaskUiState,
+    onEvent: (AddTaskEvent) -> Unit
 ) {
-    item {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(text = "My list", style = MaterialTheme.typography.titleLarge)
-
-            IconButton(onClick = { onEvent(HomeEvent.AddClick) }) {
-                Text(text = "Add", style = MaterialTheme.typography.titleMedium)
-            }
-        }
-    }
-    itemsIndexed(uiState.groups) { index, group ->
-        HomeGroupItem(
+    item { AddTaskGroupTitle(Modifier.padding(vertical = 16.dp)) }
+    itemsIndexed(items = groups) { index, group ->
+        AddTaskGroupItem(
             modifier = Modifier
                 .clip(
                     RoundedCornerShape(
                         topStart = if (index == 0) 20.dp else 0.dp,
                         topEnd = if (index == 0) 20.dp else 0.dp,
-                        bottomStart = if (index == uiState.groups.lastIndex) 20.dp else 0.dp,
-                        bottomEnd = if (index == uiState.groups.lastIndex) 20.dp else 0.dp,
+                        bottomStart = if (index == groups.lastIndex) 20.dp else 0.dp,
+                        bottomEnd = if (index == groups.lastIndex) 20.dp else 0.dp,
                     )
                 )
                 .background(containerWhite),
-            group = group
+            group = group,
+            isSelected = uiState.selectedGroup == group,
+            onGroupSelected = { selectedGroup -> onEvent(AddTaskEvent.GroupSelect(selectedGroup)) }
         )
     }
 }
 
 @Composable
-fun HomeGroupItem(
+fun AddTaskGroupTitle(
+    modifier: Modifier
+) {
+    Text(
+        modifier = modifier,
+        text = "List",
+        style = MaterialTheme.typography.titleLarge,
+    )
+}
+
+@Composable
+fun AddTaskGroupItem(
     modifier: Modifier = Modifier,
-    group: UiGroup,
+    group: DomainGroup,
+    isSelected: Boolean,
+    onGroupSelected: (DomainGroup) -> Unit,
 ) {
     Box(
         modifier = modifier
@@ -73,7 +73,7 @@ fun HomeGroupItem(
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = rememberRipple(),
-                onClick = {  },
+                onClick = { },
             )
     ) {
         Row(
@@ -84,16 +84,10 @@ fun HomeGroupItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = group.group.title,
+                text = group.title,
                 style = MaterialTheme.typography.bodyLarge
             )
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(text = group.quantity.toString(), style = MaterialTheme.typography.bodyLarge)
-                Icon(Icons.Default.KeyboardArrowRight, contentDescription = "to group route icon")
-            }
+            RadioButton(selected = isSelected, onClick = { onGroupSelected(group) })
         }
     }
 }

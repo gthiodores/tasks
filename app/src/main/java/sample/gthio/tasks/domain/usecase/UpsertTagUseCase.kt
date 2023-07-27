@@ -10,7 +10,7 @@ class UpsertTagUseCase(
     private val tagRepository: TagRepository,
 ) {
     suspend operator fun invoke(tag: DomainTag) {
-        if (tagRepository.tag.first().any { it.id == tag.id }) {
+        if (tagRepository.tag.first().any { it.id == tag.id || it.title == tag.title}) {
             tagRepository.updateTag(tag)
             taskRepository.tasks.collect { tasks ->
                 tasks.forEach { task ->

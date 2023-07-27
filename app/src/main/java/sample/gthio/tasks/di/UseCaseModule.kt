@@ -7,10 +7,10 @@ import dagger.hilt.components.SingletonComponent
 import sample.gthio.tasks.domain.repository.GroupRepository
 import sample.gthio.tasks.domain.repository.TagRepository
 import sample.gthio.tasks.domain.repository.TaskRepository
-import sample.gthio.tasks.domain.usecase.GetAllGroupsUseCase
-import sample.gthio.tasks.domain.usecase.GetAllTagsUseCase
-import sample.gthio.tasks.domain.usecase.GetAllTasksUseCase
-import sample.gthio.tasks.domain.usecase.GetTaskByTagUseCase
+import sample.gthio.tasks.domain.usecase.ObserveAllGroupUseCase
+import sample.gthio.tasks.domain.usecase.ObserveAllTagUseCase
+import sample.gthio.tasks.domain.usecase.ObserveAllTaskUseCase
+import sample.gthio.tasks.domain.usecase.ObserveTaskByTagUseCase
 import sample.gthio.tasks.domain.usecase.UpsertGroupUseCase
 import sample.gthio.tasks.domain.usecase.UpsertTagUseCase
 import sample.gthio.tasks.domain.usecase.UpsertTaskUseCase
@@ -47,27 +47,27 @@ object UseCaseModule {
     @Provides
     fun provideGetAllGroup(
         groupRepository: GroupRepository
-    ): GetAllGroupsUseCase =
-        GetAllGroupsUseCase(groupRepository)
+    ): ObserveAllGroupUseCase =
+        ObserveAllGroupUseCase(groupRepository)
 
     @Singleton
     @Provides
     fun provideGetAllTag(
         tagRepository: TagRepository
-    ): GetAllTagsUseCase =
-        GetAllTagsUseCase(tagRepository)
+    ): ObserveAllTagUseCase =
+        ObserveAllTagUseCase(tagRepository)
 
     @Singleton
     @Provides
     fun provideGetAllTask(
         taskRepository: TaskRepository
-    ): GetAllTasksUseCase =
-        GetAllTasksUseCase(taskRepository)
+    ): ObserveAllTaskUseCase =
+        ObserveAllTaskUseCase(taskRepository)
 
     @Singleton
     @Provides
     fun provideGetTaskByTag(
         taskRepository: TaskRepository
-    ): GetTaskByTagUseCase =
-        GetTaskByTagUseCase(taskRepository)
+    ): ObserveTaskByTagUseCase =
+        ObserveTaskByTagUseCase(taskRepository)
 }
