@@ -47,8 +47,6 @@ fun AddTaskRoute(
     viewModel: AddTaskViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val groups by viewModel.groups.collectAsState(initial = emptyList())
-    val tags by viewModel.tags.collectAsState(initial = emptyList())
 
     val bottomSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
@@ -117,12 +115,12 @@ fun AddTaskRoute(
                 )
             }
             addTaskInputListing(
-                tags = tags,
+                tags = uiState.tags,
                 uiState = uiState,
                 onEvent = viewModel::onEvent
             )
             addTaskGroupListing(
-                groups = groups,
+                groups = uiState.groups,
                 uiState = uiState,
                 onEvent = viewModel::onEvent
             )

@@ -33,15 +33,15 @@ class AddTaskViewModel @Inject constructor(
     observeAllTag: ObserveAllTagUseCase
 ): ViewModel() {
 
-    val groups = observeAllGroup()
+    private val _groups = observeAllGroup()
 
-    val tags = observeAllTag()
+    private val _tags = observeAllTag()
 
     private val _inputState = MutableStateFlow(AddTaskInputState())
 
     val uiState = combine(
-        groups,
-        tags,
+        _groups,
+        _tags,
         _inputState
     ) { groups, tags, inputState ->
        AddTaskUiState(
@@ -53,6 +53,8 @@ class AddTaskViewModel @Inject constructor(
         SharingStarted.WhileSubscribed(5_000),
         AddTaskUiState()
     )
+
+
 
     fun onEvent(event: AddTaskEvent) {
         when (event) {
