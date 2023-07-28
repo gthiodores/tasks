@@ -1,5 +1,6 @@
 package sample.gthio.tasks.ui.route.home
 
+import sample.gthio.tasks.domain.model.DomainGroup
 import sample.gthio.tasks.domain.model.DomainTag
 
 sealed interface HomeEvent {
@@ -8,4 +9,5 @@ sealed interface HomeEvent {
     object FabClick: HomeEvent
     object AddClick: HomeEvent
     object AllTasksClick: HomeEvent
+    data class GroupItemClick(val group: DomainGroup): HomeEvent
 }

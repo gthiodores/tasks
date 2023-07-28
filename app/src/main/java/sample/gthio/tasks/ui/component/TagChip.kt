@@ -58,7 +58,7 @@ fun TaskTagChip(
     Box(
         modifier = modifier
             .clip(CircleShape)
-            .background(color.copy(alpha = 0.3f)),
+            .background(color.copy(alpha = 0.1f)),
         contentAlignment = Alignment.Center,
     ) {
         Text(

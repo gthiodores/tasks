@@ -2,9 +2,11 @@ package sample.gthio.tasks.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import sample.gthio.tasks.ui.route.addgroup.AddGroupRoute
 import sample.gthio.tasks.ui.route.addtask.AddTaskRoute
 import sample.gthio.tasks.ui.route.home.HomeRoute
@@ -23,7 +25,10 @@ fun AppNavigator(
             HomeRoute(
                 toAddTask = { navController.navigate(route = Screen.AddTask.route) },
                 toAddGroup = { navController.navigate(route = Screen.AddGroup.route) },
-                toTaskList = { navController.navigate(route = Screen.TaskList.route) }
+                toTaskList = { groupId ->
+                    navController
+                        .navigate(route = Screen.TaskList.route.plus("/?groupId=$groupId"))
+                }
             )
         }
         composable(Screen.AddTask.route) {
@@ -36,7 +41,15 @@ fun AppNavigator(
                 onBack = { navController.navigateUp() }
             )
         }
-        composable(Screen.TaskList.route) {
+        composable(
+            route = Screen.TaskList.route.plus("/?groupId={groupId}"),
+            arguments = listOf(
+                navArgument("groupId") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                }
+            )
+        ) {
             TaskListRoute(
                 onBack = { navController.navigateUp() }
             )

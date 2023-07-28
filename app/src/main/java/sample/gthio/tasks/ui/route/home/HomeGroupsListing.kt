@@ -61,7 +61,8 @@ fun LazyListScope.homeGroups(
                     )
                 )
                 .background(containerWhite),
-            group = group
+            group = group,
+            onClick = { onEvent(HomeEvent.GroupItemClick(group.group)) }
         )
     }
 }
@@ -70,6 +71,7 @@ fun LazyListScope.homeGroups(
 fun HomeGroupItem(
     modifier: Modifier = Modifier,
     group: UiGroup,
+    onClick: () -> Unit,
 ) {
     Row(
         modifier = modifier
@@ -78,7 +80,7 @@ fun HomeGroupItem(
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = rememberRipple(),
-                onClick = { },
+                onClick = onClick,
             )
     ) {
         Box(

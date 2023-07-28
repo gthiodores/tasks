@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import sample.gthio.tasks.R
 import sample.gthio.tasks.ui.theme.allTaskContainer
 import sample.gthio.tasks.ui.theme.allTaskIcon
+import sample.gthio.tasks.ui.theme.containerWhite
 import sample.gthio.tasks.ui.theme.importantContainer
 import sample.gthio.tasks.ui.theme.importantIcon
 import sample.gthio.tasks.ui.theme.scheduledContainer
@@ -62,7 +63,7 @@ fun HomeMenu(
             )
             HomeMenuGrid(
                 name = "Important",
-                quantity = 0,
+                quantity = uiState.tasks.count { task -> task.isImportant },
                 icon = R.drawable.baseline_star_24,
                 iconColor = importantIcon,
                 containerColor = importantContainer,
@@ -125,7 +126,7 @@ fun HomeMenuGrid(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(containerColor)
+                    .background(containerWhite)
                     .align(Alignment.TopStart),
                 contentAlignment = Alignment.Center,
             ) {

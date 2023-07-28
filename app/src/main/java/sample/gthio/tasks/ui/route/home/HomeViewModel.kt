@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import sample.gthio.tasks.domain.model.DomainGroup
 import sample.gthio.tasks.domain.model.DomainTag
 import sample.gthio.tasks.domain.usecase.ObserveAllGroupUseCase
 import sample.gthio.tasks.domain.usecase.ObserveAllTagUseCase
@@ -80,6 +81,8 @@ class HomeViewModel @Inject constructor(
             is HomeEvent.FabClick -> handleFabClick()
             is HomeEvent.AddClick -> handleAddClick()
             HomeEvent.AllTasksClick -> handleAllTasksClick()
+            is HomeEvent.GroupItemClick -> handleGroupItemClick(event.group)
+
         }
     }
 
@@ -100,7 +103,11 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun handleAllTasksClick() {
-        _navigation.update { HomeNavigationTarget.TaskList }
+        _navigation.update { HomeNavigationTarget.TaskList(null) }
+    }
+
+    private fun handleGroupItemClick(group: DomainGroup) {
+        _navigation.update { HomeNavigationTarget.TaskList(group.id.toString()) }
     }
     fun homeNavigationDone() { _navigation.update { null } }
 }
