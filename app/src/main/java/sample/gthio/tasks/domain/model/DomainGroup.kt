@@ -33,3 +33,15 @@ fun GroupColor.toColor(): Color {
         GroupColor.YELLOW -> Color.Yellow
     }
 }
+
+fun toGroupColor(color: Color): GroupColor? {
+    return when (color) {
+        Color.Magenta -> GroupColor.PURPLE
+        Color.Red -> GroupColor.RED
+        Color.Blue -> GroupColor.BLUE
+        Color.Green -> GroupColor.GREEN
+        Color.Cyan -> GroupColor.CYAN
+        Color.Yellow -> GroupColor.YELLOW
+        else -> null
+    }
+}

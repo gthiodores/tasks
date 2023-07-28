@@ -5,4 +5,6 @@ import androidx.compose.ui.graphics.Color
 sealed interface AddGroupEvent {
     data class SelectColor(val color: Color): AddGroupEvent
     data class TitleValueChange(val title: String): AddGroupEvent
+    object BackPressed: AddGroupEvent
+    object CheckPressed: AddGroupEvent
 }

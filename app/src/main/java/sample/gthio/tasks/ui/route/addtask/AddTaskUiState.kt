@@ -32,21 +32,20 @@ data class AddTaskUiState(
     val groups: List<DomainGroup> = emptyList(),
     val shouldNavigateBack: Boolean = false,
 ) {
-    fun fromInputState(input: AddTaskInputState): AddTaskUiState =
-        AddTaskUiState(
-            title = input.title,
-            description = input.description,
-            date = input.date,
-            time = input.time,
-            isImportant = input.isImportant,
-            selectedTags = input.selectedTags,
-            newTag = input.newTag,
-            selectedGroup = input.selectedGroup,
-            isDateOpen = input.isDateOpen,
-            isTimeOpen = input.isTimeOpen,
-            isTagOpen = input.isTagOpen,
-            shouldNavigateBack = input.shouldNavigateBack
-        )
+    fun fromInputState(input: AddTaskInputState): AddTaskUiState = copy(
+        title = input.title,
+        description = input.description,
+        date = input.date,
+        time = input.time,
+        isImportant = input.isImportant,
+        selectedTags = input.selectedTags,
+        newTag = input.newTag,
+        selectedGroup = input.selectedGroup,
+        isDateOpen = input.isDateOpen,
+        isTimeOpen = input.isTimeOpen,
+        isTagOpen = input.isTagOpen,
+        shouldNavigateBack = input.shouldNavigateBack
+    )
 }
 
 data class AddTaskInputState(

@@ -22,6 +22,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -37,17 +38,23 @@ fun AddGroupRoute(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    LaunchedEffect(key1 = uiState.shouldNavigateBack) {
+        if (uiState.shouldNavigateBack) {
+            onBack()
+        }
+    }
+
     Scaffold(
         topBar = {
             TaskCenterAppBar(
                 title = { Text(text = "Add Group") },
                 navigationIcon = {
-                    IconButton(onClick = {  }) {
+                    IconButton(onClick = { viewModel.onEvent(AddGroupEvent.BackPressed) }) {
                         Icon(Icons.Default.Close, contentDescription = "nav back stack")
                     }
                 },
                 actions = {
-                    IconButton(onClick = {  }) {
+                    IconButton(onClick = { viewModel.onEvent(AddGroupEvent.CheckPressed) }) {
                         Icon(Icons.Default.Check, contentDescription = "save group")
                     }
                 }
@@ -64,11 +71,14 @@ fun AddGroupRoute(
                     modifier = Modifier.fillMaxWidth(),
                     color = uiState.selectedGroupColor,
                     title = uiState.title,
-                    onValueChange = { }
+                    onValueChange = { value -> viewModel.onEvent(AddGroupEvent.TitleValueChange(value)) }
                 )
             }
             item {
-                AddGroupColorInputList(availableColors = uiState.availableColors)
+                AddGroupColorInputList(
+                    availableColors = uiState.availableColors,
+                    onColorSelect = { color -> viewModel.onEvent(AddGroupEvent.SelectColor(color)) }
+                )
             }
         }
     }
@@ -103,6 +113,7 @@ fun AddGroupTitleEditText(
 @Composable
 fun AddGroupColorInputList(
     availableColors: List<Color>,
+    onColorSelect: (Color) -> Unit
 ) {
     FlowRow(
         modifier = Modifier
@@ -118,7 +129,7 @@ fun AddGroupColorInputList(
                         color = color,
                         shape = CircleShape
                     )
-                    .clickable { AddGroupEvent.SelectColor(color) }
+                    .clickable { onColorSelect(color) }
             )
         }
     }
