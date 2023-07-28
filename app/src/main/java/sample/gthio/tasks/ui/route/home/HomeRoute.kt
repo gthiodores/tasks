@@ -34,6 +34,7 @@ fun HomeRoute(
     viewModel: HomeViewModel = hiltViewModel(),
     toAddTask: () -> Unit,
     toAddGroup: () -> Unit,
+    toTaskList: () -> Unit,
 ) {
     val navigation by viewModel.navigationTarget.collectAsState()
 
@@ -45,6 +46,7 @@ fun HomeRoute(
                 when (target) {
                     is HomeNavigationTarget.AddTask -> toAddTask()
                     is HomeNavigationTarget.AddGroup -> toAddGroup()
+                    is HomeNavigationTarget.TaskList -> toTaskList()
                 }
                 viewModel.homeNavigationDone()
             }
@@ -89,7 +91,12 @@ fun HomeRoute(
                 .padding(horizontal = 16.dp)
                 .background(surfaceGray),
         ) {
-            item { HomeMenu() }
+            item {
+                HomeMenu(
+                    uiState = uiState,
+                    onEvent = viewModel::onEvent
+                )
+            }
             homeTagsChipGroup(
                 uiState = uiState,
                 onEvent = viewModel::onEvent

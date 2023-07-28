@@ -1,6 +1,7 @@
 package sample.gthio.tasks.ui.route.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,7 +37,9 @@ import sample.gthio.tasks.ui.theme.todayIcon
 
 @Composable
 fun HomeMenu(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    uiState: HomeUiState,
+    onEvent: (HomeEvent) -> Unit
 ) {
     Row(
         modifier = modifier
@@ -56,6 +59,7 @@ fun HomeMenu(
                 iconColor = scheduledIcon,
                 containerColor = scheduledContainer,
                 isLarge = true,
+                onClick = {}
             )
             HomeMenuGrid(
                 name = "Important",
@@ -64,6 +68,7 @@ fun HomeMenu(
                 iconColor = importantIcon,
                 containerColor = importantContainer,
                 isLarge = false,
+                onClick = {}
             )
         }
         Column(
@@ -78,14 +83,16 @@ fun HomeMenu(
                 iconColor = todayIcon,
                 containerColor = todayContainer,
                 isLarge = false,
+                onClick = {}
             )
             HomeMenuGrid(
                 name = "All Tasks",
-                quantity = 0,
+                quantity = uiState.tasks.size,
                 icon = R.drawable.baseline_folder_open_24,
                 iconColor = allTaskIcon,
                 containerColor = allTaskContainer,
                 isLarge = true,
+                onClick = { onEvent(HomeEvent.AllTasksClick) }
             )
         }
     }
@@ -100,6 +107,7 @@ fun HomeMenuGrid(
     iconColor: Color,
     containerColor: Color,
     isLarge: Boolean,
+    onClick: () -> Unit,
 ) {
     Box(
         modifier = modifier
@@ -107,6 +115,7 @@ fun HomeMenuGrid(
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .background(containerColor)
+            .clickable { onClick() }
     ) {
         Box(
             modifier = Modifier

@@ -79,6 +79,7 @@ class HomeViewModel @Inject constructor(
             is HomeEvent.SelectTag -> handleSelectTag(event.tag)
             is HomeEvent.FabClick -> handleFabClick()
             is HomeEvent.AddClick -> handleAddClick()
+            HomeEvent.AllTasksClick -> handleAllTasksClick()
         }
     }
 
@@ -96,6 +97,10 @@ class HomeViewModel @Inject constructor(
 
     private fun handleAddClick() {
         _navigation.update { HomeNavigationTarget.AddGroup }
+    }
+
+    private fun handleAllTasksClick() {
+        _navigation.update { HomeNavigationTarget.TaskList }
     }
     fun homeNavigationDone() { _navigation.update { null } }
 }

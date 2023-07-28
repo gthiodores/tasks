@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import sample.gthio.tasks.ui.route.addgroup.AddGroupRoute
 import sample.gthio.tasks.ui.route.addtask.AddTaskRoute
 import sample.gthio.tasks.ui.route.home.HomeRoute
+import sample.gthio.tasks.ui.route.taskList.TaskListRoute
 
 @Composable
 fun AppNavigator(
@@ -21,7 +22,8 @@ fun AppNavigator(
         composable(Screen.Home.route) {
             HomeRoute(
                 toAddTask = { navController.navigate(route = Screen.AddTask.route) },
-                toAddGroup = { navController.navigate(route = Screen.AddGroup.route) }
+                toAddGroup = { navController.navigate(route = Screen.AddGroup.route) },
+                toTaskList = { navController.navigate(route = Screen.TaskList.route) }
             )
         }
         composable(Screen.AddTask.route) {
@@ -31,6 +33,11 @@ fun AppNavigator(
         }
         composable(Screen.AddGroup.route) {
             AddGroupRoute(
+                onBack = { navController.navigateUp() }
+            )
+        }
+        composable(Screen.TaskList.route) {
+            TaskListRoute(
                 onBack = { navController.navigateUp() }
             )
         }
