@@ -30,7 +30,6 @@ import sample.gthio.tasks.ui.theme.importantContainer
 import sample.gthio.tasks.ui.theme.importantIcon
 import sample.gthio.tasks.ui.theme.scheduledContainer
 import sample.gthio.tasks.ui.theme.scheduledIcon
-import sample.gthio.tasks.ui.theme.surfaceGray
 import sample.gthio.tasks.ui.theme.textGray
 import sample.gthio.tasks.ui.theme.todayContainer
 import sample.gthio.tasks.ui.theme.todayIcon
@@ -126,7 +125,7 @@ fun HomeMenuGrid(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(surfaceGray)
+                    .background(containerColor)
                     .align(Alignment.TopStart),
                 contentAlignment = Alignment.Center,
             ) {
