@@ -11,20 +11,13 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
-import sample.gthio.tasks.domain.model.DomainGroup
 import sample.gthio.tasks.domain.model.DomainTag
 import sample.gthio.tasks.domain.usecase.ObserveAllGroupUseCase
 import sample.gthio.tasks.domain.usecase.ObserveAllTagUseCase
 import sample.gthio.tasks.domain.usecase.ObserveAllTaskUseCase
 import sample.gthio.tasks.domain.usecase.ObserveTaskByTagUseCase
 import sample.gthio.tasks.domain.usecase.UpsertGroupUseCase
-import sample.gthio.tasks.domain.usecase.UpsertTagUseCase
-import sample.gthio.tasks.domain.usecase.UpsertTaskUseCase
 import sample.gthio.tasks.ui.model.UiGroup
-import sample.gthio.tasks.ui.route.addgroup.AddGroupInputState
-import sample.gthio.tasks.ui.route.addgroup.AddGroupUiState
-import java.util.UUID
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -34,9 +27,7 @@ class HomeViewModel @Inject constructor(
     private val observeTaskByTag: ObserveTaskByTagUseCase,
     observeAllGroup: ObserveAllGroupUseCase,
     observeAllTag: ObserveAllTagUseCase,
-    private val upsertTag: UpsertTagUseCase,
     private val upsertGroup: UpsertGroupUseCase,
-    private val upsertTask: UpsertTaskUseCase,
 ) : ViewModel() {
 
     private val _navigation = MutableStateFlow<HomeNavigationTarget?>(null)
@@ -82,22 +73,6 @@ class HomeViewModel @Inject constructor(
         HomeUiState()
     )
 
-    private val _addGroupInputState = MutableStateFlow(AddGroupInputState())
-
-    val addGroupUiState = combine(
-        _groups,
-        _addGroupInputState
-    ) { groups, inputState ->
-        AddGroupUiState(
-            groups = groups,
-            selectedGroup = inputState.selectedGroup
-        )
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5_000),
-        AddGroupUiState()
-    )
-
     fun onEvent(event: HomeEvent) {
         when (event) {
             is HomeEvent.SelectAllTags -> handleSelectAllTag()
@@ -120,10 +95,7 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun handleAddClick() {
-        viewModelScope.launch {
-            upsertGroup(DomainGroup(title = UUID.randomUUID().toString().split("-")[0]))
-        }
+        _navigation.update { HomeNavigationTarget.AddGroup }
     }
-
     fun homeNavigationDone() { _navigation.update { null } }
 }

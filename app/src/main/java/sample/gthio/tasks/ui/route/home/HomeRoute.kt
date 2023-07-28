@@ -33,6 +33,7 @@ import sample.gthio.tasks.ui.theme.textBlack
 fun HomeRoute(
     viewModel: HomeViewModel = hiltViewModel(),
     toAddTask: () -> Unit,
+    toAddGroup: () -> Unit,
 ) {
     val navigation by viewModel.navigationTarget.collectAsState()
 
@@ -43,6 +44,7 @@ fun HomeRoute(
             navigation?.let { target ->
                 when (target) {
                     is HomeNavigationTarget.AddTask -> toAddTask()
+                    is HomeNavigationTarget.AddGroup -> toAddGroup()
                 }
                 viewModel.homeNavigationDone()
             }
