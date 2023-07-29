@@ -43,6 +43,7 @@ import sample.gthio.tasks.R
 import sample.gthio.tasks.domain.model.DomainTask
 import sample.gthio.tasks.domain.model.toColor
 import sample.gthio.tasks.ui.component.TaskTagChip
+import sample.gthio.tasks.ui.extension.toDateString
 import sample.gthio.tasks.ui.theme.containerWhite
 import sample.gthio.tasks.ui.theme.surfaceGray
 import sample.gthio.tasks.ui.theme.textGray
@@ -72,7 +73,7 @@ fun TaskListRoute(
                     IconButton(onClick = { /*TODO*/ }) {
                         Icon(
                             painter = painterResource(id = R.drawable.baseline_filter_list_24),
-                            contentDescription = "nav back stack"
+                            contentDescription = "filter list"
                         )
                     }
                 }
@@ -102,8 +103,7 @@ fun TaskListItem(
 ) {
     Row(
         modifier = modifier
-            .height(IntrinsicSize.Min)
-            .padding(horizontal = 16.dp),
+            .height(IntrinsicSize.Min),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Column(
@@ -140,6 +140,7 @@ fun TaskListItem(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(text = task.title, style = MaterialTheme.typography.titleLarge)
+                Text(text = "${task.date.toDateString()}, ${task.time}")
                 Text(text = task.description ?: "")
                 if (task.tags.isNotEmpty()) {
                     FlowRow(

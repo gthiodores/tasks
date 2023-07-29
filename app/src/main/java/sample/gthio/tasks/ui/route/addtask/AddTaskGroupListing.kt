@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -89,7 +90,11 @@ fun AddTaskGroupItem(
                 text = group.title,
                 style = MaterialTheme.typography.bodyLarge
             )
-            RadioButton(selected = isSelected, onClick = { onGroupSelected(group) })
+            RadioButton(
+                modifier = Modifier.size(24.dp),
+                selected = isSelected,
+                onClick = { onGroupSelected(group) })
+
         }
     }
 }

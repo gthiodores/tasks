@@ -71,6 +71,7 @@ fun AddTaskRoute(
 
     if (uiState.isTimeOpen) {
         ModalBottomSheet(
+            sheetState = bottomSheetState,
             onDismissRequest = { viewModel.onEvent(AddTaskEvent.DismissTime) }
         ) {
             AddTaskBottomSheet(

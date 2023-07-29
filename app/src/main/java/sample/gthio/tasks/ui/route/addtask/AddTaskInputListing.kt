@@ -174,9 +174,17 @@ fun AddTaskInputContainer(
         ) {
             Text(text = result)
             if (isExpanded) {
-                Icon(Icons.Default.KeyboardArrowUp, contentDescription = "expand container icon")
+                Icon(
+                    modifier = Modifier.size(24.dp),
+                    imageVector = Icons.Default.KeyboardArrowUp,
+                    contentDescription = "expand container icon"
+                )
             } else {
-                Icon(Icons.Default.KeyboardArrowDown, contentDescription = "close container icon")
+                Icon(
+                    modifier = Modifier.size(24.dp),
+                    imageVector = Icons.Default.KeyboardArrowDown,
+                    contentDescription = "close container icon"
+                )
             }
         }
     }
@@ -205,7 +213,7 @@ fun AddTaskInputDate(
                 .atStartOfDayIn(TimeZone.currentSystemDefault())
                 .toEpochMilliseconds()
         )
-        LaunchedEffect(key1 = datePickerState) {
+        LaunchedEffect(key1 = datePickerState.selectedDateMillis) {
             if (datePickerState.selectedDateMillis != null) {
                 onDateChange(datePickerState.selectedDateMillis!!)
             }
@@ -325,6 +333,10 @@ fun AddTaskMarkAsImportantToggle(
             }
             Text(text = "Mark as important")
         }
-        RadioButton(selected = isImportant, onClick = onClick)
+        RadioButton(
+            modifier = Modifier.size(24.dp),
+            selected = isImportant,
+            onClick = onClick
+        )
     }
 }

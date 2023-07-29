@@ -121,6 +121,8 @@ class AddTaskViewModel @Inject constructor(
                     DomainTask(
                         title = _inputState.value.title,
                         description = if (_inputState.value.description != "") _inputState.value.description else null,
+                        date = _inputState.value.date,
+                        time = _inputState.value.time,
                         tags = _inputState.value.selectedTags,
                         isImportant = _inputState.value.isImportant,
                         group = _inputState.value.selectedGroup!!,
