@@ -23,6 +23,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import sample.gthio.tasks.R
 import sample.gthio.tasks.ui.theme.allTaskContainer
 import sample.gthio.tasks.ui.theme.allTaskIcon
@@ -68,7 +71,7 @@ fun HomeMenu(
                 iconColor = importantIcon,
                 containerColor = importantContainer,
                 isLarge = false,
-                onClick = {}
+                onClick = { onEvent(HomeEvent.ImportantClick) }
             )
         }
         Column(
@@ -78,12 +81,13 @@ fun HomeMenu(
         ) {
             HomeMenuGrid(
                 name = "Today",
-                quantity = 0,
+                quantity = uiState.tasks.count { task -> task.date == Clock.System.now().toLocalDateTime(
+                    TimeZone.currentSystemDefault()).date },
                 icon = R.drawable.baseline_calendar_today_24,
                 iconColor = todayIcon,
                 containerColor = todayContainer,
                 isLarge = false,
-                onClick = {}
+                onClick = { onEvent(HomeEvent.TodayClick) }
             )
             HomeMenuGrid(
                 name = "All Tasks",

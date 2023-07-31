@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import sample.gthio.tasks.ui.theme.surfaceGray
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,7 +60,8 @@ fun AddGroupRoute(
                     }
                 }
             )
-        }
+        },
+        containerColor = surfaceGray
     ) { contentPadding ->
         LazyColumn(
             modifier = Modifier
@@ -117,7 +119,8 @@ fun AddGroupColorInputList(
 ) {
     FlowRow(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {

@@ -20,5 +20,6 @@ fun LocalDate.toDateString(): String {
 }
 
 fun LocalTime.toTimeString(): String {
-    return "${this.hour}:${this.minute}"
+    val time = this.toString().split(":")
+    return "${time[0]}:${time[1]}"
 }

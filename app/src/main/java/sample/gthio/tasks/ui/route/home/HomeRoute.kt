@@ -34,7 +34,7 @@ fun HomeRoute(
     viewModel: HomeViewModel = hiltViewModel(),
     toAddTask: () -> Unit,
     toAddGroup: () -> Unit,
-    toTaskList: (String?) -> Unit,
+    toTaskList: (String?, String?) -> Unit,
 ) {
     val navigation by viewModel.navigationTarget.collectAsState()
 
@@ -46,7 +46,7 @@ fun HomeRoute(
                 when (target) {
                     is HomeNavigationTarget.AddTask -> toAddTask()
                     is HomeNavigationTarget.AddGroup -> toAddGroup()
-                    is HomeNavigationTarget.TaskList -> toTaskList(target.groupId)
+                    is HomeNavigationTarget.TaskList -> toTaskList(target.query, target.groupId)
                 }
                 viewModel.homeNavigationDone()
             }

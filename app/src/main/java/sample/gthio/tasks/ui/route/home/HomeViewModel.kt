@@ -17,7 +17,6 @@ import sample.gthio.tasks.domain.usecase.ObserveAllGroupUseCase
 import sample.gthio.tasks.domain.usecase.ObserveAllTagUseCase
 import sample.gthio.tasks.domain.usecase.ObserveAllTaskUseCase
 import sample.gthio.tasks.domain.usecase.ObserveTaskByTagUseCase
-import sample.gthio.tasks.domain.usecase.UpsertGroupUseCase
 import sample.gthio.tasks.ui.model.UiGroup
 import javax.inject.Inject
 
@@ -28,7 +27,6 @@ class HomeViewModel @Inject constructor(
     private val observeTaskByTag: ObserveTaskByTagUseCase,
     observeAllGroup: ObserveAllGroupUseCase,
     observeAllTag: ObserveAllTagUseCase,
-    private val upsertGroup: UpsertGroupUseCase,
 ) : ViewModel() {
 
     private val _navigation = MutableStateFlow<HomeNavigationTarget?>(null)
@@ -81,6 +79,8 @@ class HomeViewModel @Inject constructor(
             is HomeEvent.FabClick -> handleFabClick()
             is HomeEvent.AddClick -> handleAddClick()
             HomeEvent.AllTasksClick -> handleAllTasksClick()
+            HomeEvent.ImportantClick -> handleImportantClick()
+            HomeEvent.TodayClick -> handleTodayClick()
             is HomeEvent.GroupItemClick -> handleGroupItemClick(event.group)
 
         }
@@ -103,11 +103,20 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun handleAllTasksClick() {
-        _navigation.update { HomeNavigationTarget.TaskList(null) }
+        _navigation.update { HomeNavigationTarget.TaskList("all_tasks", "") }
     }
 
     private fun handleGroupItemClick(group: DomainGroup) {
-        _navigation.update { HomeNavigationTarget.TaskList(group.id.toString()) }
+        _navigation.update { HomeNavigationTarget.TaskList("", group.id.toString()) }
     }
+
+    private fun handleImportantClick() {
+        _navigation.update { HomeNavigationTarget.TaskList("important", "") }
+    }
+
+    private fun handleTodayClick() {
+        _navigation.update { HomeNavigationTarget.TaskList("today", "") }
+    }
+
     fun homeNavigationDone() { _navigation.update { null } }
 }

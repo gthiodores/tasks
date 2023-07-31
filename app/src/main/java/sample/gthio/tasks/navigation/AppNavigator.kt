@@ -10,7 +10,7 @@ import androidx.navigation.navArgument
 import sample.gthio.tasks.ui.route.addgroup.AddGroupRoute
 import sample.gthio.tasks.ui.route.addtask.AddTaskRoute
 import sample.gthio.tasks.ui.route.home.HomeRoute
-import sample.gthio.tasks.ui.route.tasklist.TaskListRoute
+import sample.gthio.tasks.ui.route.taskList.TaskListRoute
 
 @Composable
 fun AppNavigator(
@@ -25,9 +25,9 @@ fun AppNavigator(
             HomeRoute(
                 toAddTask = { navController.navigate(route = Screen.AddTask.route) },
                 toAddGroup = { navController.navigate(route = Screen.AddGroup.route) },
-                toTaskList = { groupId ->
+                toTaskList = { query, groupId ->
                     navController
-                        .navigate(route = Screen.TaskList.route.plus("/?groupId=$groupId"))
+                        .navigate(route = Screen.TaskList.route.plus("/?query=$query&groupId=$groupId"))
                 }
             )
         }
@@ -42,8 +42,12 @@ fun AppNavigator(
             )
         }
         composable(
-            route = Screen.TaskList.route.plus("/?groupId={groupId}"),
+            route = Screen.TaskList.route.plus("/?query={query}&groupId={groupId}"),
             arguments = listOf(
+                navArgument("query") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                },
                 navArgument("groupId") {
                     type = NavType.StringType
                     defaultValue = ""

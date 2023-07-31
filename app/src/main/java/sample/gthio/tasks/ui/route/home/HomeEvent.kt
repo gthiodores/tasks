@@ -9,5 +9,7 @@ sealed interface HomeEvent {
     object FabClick: HomeEvent
     object AddClick: HomeEvent
     object AllTasksClick: HomeEvent
+    object ImportantClick: HomeEvent
+    object TodayClick: HomeEvent
     data class GroupItemClick(val group: DomainGroup): HomeEvent
 }

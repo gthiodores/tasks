@@ -1,6 +1,7 @@
-package sample.gthio.tasks.ui.route.tasklist
+package sample.gthio.tasks.ui.route.taskList
 
 import TaskCenterAppBar
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -46,10 +47,12 @@ import sample.gthio.tasks.ui.component.TaskTagChip
 import sample.gthio.tasks.ui.extension.toDateString
 import sample.gthio.tasks.ui.extension.toTimeString
 import sample.gthio.tasks.ui.theme.containerWhite
+import sample.gthio.tasks.ui.theme.importantContainer
+import sample.gthio.tasks.ui.theme.importantIcon
 import sample.gthio.tasks.ui.theme.surfaceGray
 import sample.gthio.tasks.ui.theme.textGray
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun TaskListRoute(
     viewModel: TaskListViewModel = hiltViewModel(),
@@ -89,11 +92,24 @@ fun TaskListRoute(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item { Spacer(modifier = Modifier.padding(0.dp)) }
-            items(items = uiState.tasks) { task ->
-                TaskListItem(task = task)
+            uiState.tasks.forEach { (date, tasks) ->
+                stickyHeader {
+                    TaskListItemHeader(title = date)
+                }
+                items(items = tasks) { task ->
+                    TaskListItem(task = task)
+                }
             }
         }
     }
+}
+
+@Composable
+fun TaskListItemHeader(
+    modifier: Modifier = Modifier,
+    title: String
+) {
+    Text(modifier = modifier, text = title, style = MaterialTheme.typography.headlineSmall)
 }
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -140,7 +156,28 @@ fun TaskListItem(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(text = task.title, style = MaterialTheme.typography.titleLarge)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(text = task.title, style = MaterialTheme.typography.titleLarge)
+                    if (task.isImportant) {
+                        Box(
+                            modifier = Modifier
+                                .size(32.dp)
+                                .background(color = importantContainer, shape = CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                modifier = Modifier.size(18.dp),
+                                painter = painterResource(id = R.drawable.baseline_star_24),
+                                tint = importantIcon,
+                                contentDescription = "important icon"
+                            )
+                        }
+                    }
+                }
                 Text(text = "${task.date.toDateString()}, ${task.time.toTimeString()}")
                 Text(text = task.description ?: "")
                 if (task.tags.isNotEmpty()) {
