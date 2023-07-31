@@ -70,14 +70,17 @@ class AddGroupViewModel @Inject constructor(
 
     private fun handleCheckPressed() {
         viewModelScope.launch {
-            if (_inputState.value.selectedGroupColor != null || toGroupColor(_inputState.value.selectedGroupColor!!) != null) {
-                upsertGroup(
-                    DomainGroup(
-                        title = _inputState.value.title,
-                        groupColor = toGroupColor(_inputState.value.selectedGroupColor!!)!!
+            if (_inputState.value.selectedGroupColor != null) {
+                val groupColor = toGroupColor(_inputState.value.selectedGroupColor!!)
+                if (groupColor != null) {
+                    upsertGroup(
+                        DomainGroup(
+                            title = _inputState.value.title,
+                            groupColor = groupColor
+                        )
                     )
-                )
-                _inputState.update { old -> old.copy(shouldNavigateBack = true) }
+                    _inputState.update { old -> old.copy(shouldNavigateBack = true) }
+                }
             }
         }
     }
