@@ -1,4 +1,4 @@
-package sample.gthio.tasks.ui.route.taskList
+package sample.gthio.tasks.ui.route.tasklist
 
 import sample.gthio.tasks.domain.model.DomainGroup
 import sample.gthio.tasks.domain.model.DomainTask

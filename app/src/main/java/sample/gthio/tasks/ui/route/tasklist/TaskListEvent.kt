@@ -1,4 +1,4 @@
-package sample.gthio.tasks.ui.route.taskList
+package sample.gthio.tasks.ui.route.tasklist
 
 sealed interface TaskListEvent {
     object BackPressed: TaskListEvent

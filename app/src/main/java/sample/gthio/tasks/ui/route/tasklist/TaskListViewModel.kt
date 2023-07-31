@@ -1,4 +1,4 @@
-package sample.gthio.tasks.ui.route.taskList
+package sample.gthio.tasks.ui.route.tasklist
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

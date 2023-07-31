@@ -1,4 +1,4 @@
-package sample.gthio.tasks.ui.route.taskList
+package sample.gthio.tasks.ui.route.tasklist
 
 import TaskCenterAppBar
 import androidx.compose.foundation.background
@@ -44,6 +44,7 @@ import sample.gthio.tasks.domain.model.DomainTask
 import sample.gthio.tasks.domain.model.toColor
 import sample.gthio.tasks.ui.component.TaskTagChip
 import sample.gthio.tasks.ui.extension.toDateString
+import sample.gthio.tasks.ui.extension.toTimeString
 import sample.gthio.tasks.ui.theme.containerWhite
 import sample.gthio.tasks.ui.theme.surfaceGray
 import sample.gthio.tasks.ui.theme.textGray
@@ -140,7 +141,7 @@ fun TaskListItem(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(text = task.title, style = MaterialTheme.typography.titleLarge)
-                Text(text = "${task.date.toDateString()}, ${task.time}")
+                Text(text = "${task.date.toDateString()}, ${task.time.toTimeString()}")
                 Text(text = task.description ?: "")
                 if (task.tags.isNotEmpty()) {
                     FlowRow(

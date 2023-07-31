@@ -10,7 +10,7 @@ import androidx.navigation.navArgument
 import sample.gthio.tasks.ui.route.addgroup.AddGroupRoute
 import sample.gthio.tasks.ui.route.addtask.AddTaskRoute
 import sample.gthio.tasks.ui.route.home.HomeRoute
-import sample.gthio.tasks.ui.route.taskList.TaskListRoute
+import sample.gthio.tasks.ui.route.tasklist.TaskListRoute
 
 @Composable
 fun AppNavigator(

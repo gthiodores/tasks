@@ -43,6 +43,8 @@ import kotlinx.datetime.atStartOfDayIn
 import sample.gthio.tasks.R
 import sample.gthio.tasks.domain.model.DomainTag
 import sample.gthio.tasks.ui.component.TagChip
+import sample.gthio.tasks.ui.extension.toDateString
+import sample.gthio.tasks.ui.extension.toTimeString
 import sample.gthio.tasks.ui.theme.containerWhite
 import sample.gthio.tasks.ui.theme.surfaceGray
 import sample.gthio.tasks.ui.theme.textGray
@@ -58,14 +60,14 @@ fun LazyListScope.addTaskInputListing(
                 .padding(top = 16.dp)
                 .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)),
             date = uiState.date,
-            result = "",
+            result = uiState.date.toDateString(),
             onDateChange = { dateInMillis -> onEvent(AddTaskEvent.SaveDate(dateInMillis))},
             isExpanded = uiState.isDateOpen,
             onClick = { onEvent(AddTaskEvent.OpenDate) },
         )
         AddTaskInputTime(
             modifier = Modifier,
-            result = "",
+            result = uiState.time.toTimeString(),
             isExpanded = uiState.isTimeOpen,
             onClick = { onEvent(AddTaskEvent.OpenTime) }
         )
