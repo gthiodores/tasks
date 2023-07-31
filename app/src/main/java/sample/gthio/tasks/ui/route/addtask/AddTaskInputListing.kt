@@ -46,6 +46,8 @@ import sample.gthio.tasks.ui.component.TagChip
 import sample.gthio.tasks.ui.extension.toDateString
 import sample.gthio.tasks.ui.extension.toTimeString
 import sample.gthio.tasks.ui.theme.containerWhite
+import sample.gthio.tasks.ui.theme.importantContainer
+import sample.gthio.tasks.ui.theme.importantIcon
 import sample.gthio.tasks.ui.theme.surfaceGray
 import sample.gthio.tasks.ui.theme.textGray
 
@@ -323,13 +325,13 @@ fun AddTaskMarkAsImportantToggle(
             Box(
                 modifier = Modifier
                     .size(32.dp)
-                    .background(color = surfaceGray, shape = CircleShape),
+                    .background(color = importantContainer, shape = CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     modifier = Modifier.size(18.dp),
                     painter = painterResource(id = R.drawable.baseline_star_24),
-                    tint = textGray,
+                    tint = importantIcon,
                     contentDescription = "input icon"
                 )
             }
