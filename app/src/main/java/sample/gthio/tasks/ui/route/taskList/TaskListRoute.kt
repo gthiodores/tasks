@@ -4,6 +4,7 @@ import TaskCenterAppBar
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,6 +38,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -93,11 +95,16 @@ fun TaskListRoute(
         ) {
             item { Spacer(modifier = Modifier.padding(0.dp)) }
             uiState.tasks.forEach { (date, tasks) ->
-                stickyHeader {
-                    TaskListItemHeader(title = date)
-                }
-                items(items = tasks) { task ->
-                    TaskListItem(task = task)
+                if (tasks.isNotEmpty()) {
+                    stickyHeader {
+                        TaskListItemHeader(title = date)
+                    }
+                    items(items = tasks) { task ->
+                        TaskListItem(
+                            task = task,
+                            onTaskFinishClick = { _task -> viewModel.onEvent(TaskListEvent.TaskFinishClick(_task))}
+                        )
+                    }
                 }
             }
         }
@@ -109,7 +116,7 @@ fun TaskListItemHeader(
     modifier: Modifier = Modifier,
     title: String
 ) {
-    Text(modifier = modifier, text = title, style = MaterialTheme.typography.headlineSmall)
+    Text(modifier = modifier, text = title, style = MaterialTheme.typography.titleLarge)
 }
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -117,6 +124,7 @@ fun TaskListItemHeader(
 fun TaskListItem(
     modifier: Modifier = Modifier,
     task: DomainTask,
+    onTaskFinishClick: (DomainTask) -> Unit
 ) {
     Row(
         modifier = modifier
@@ -130,7 +138,10 @@ fun TaskListItem(
             Box(
                 modifier = Modifier
                     .size(24.dp)
+                    .clip(CircleShape)
+                    .background(color = if (task.isFinished) textGray else Color.Transparent)
                     .border(width = 2.dp, color = textGray, shape = CircleShape)
+                    .clickable { onTaskFinishClick(task) }
             )
             Box(
                 modifier = Modifier
