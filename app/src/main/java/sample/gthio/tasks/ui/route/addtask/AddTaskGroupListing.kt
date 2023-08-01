@@ -1,27 +1,28 @@
 package sample.gthio.tasks.ui.route.addtask
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import sample.gthio.tasks.domain.model.DomainGroup
+import sample.gthio.tasks.domain.model.toColor
 import sample.gthio.tasks.ui.theme.containerWhite
 
 fun LazyListScope.addTaskGroupListing(
@@ -67,15 +68,17 @@ fun AddTaskGroupItem(
     isSelected: Boolean,
     onGroupSelected: (DomainGroup) -> Unit,
 ) {
-    Box(
+    Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = rememberRipple(),
-                onClick = { },
-            )
+            .height(56.dp)
     ) {
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .width(8.dp)
+                .background(group.groupColor.toColor())
+        )
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -87,7 +90,11 @@ fun AddTaskGroupItem(
                 text = group.title,
                 style = MaterialTheme.typography.bodyLarge
             )
-            RadioButton(selected = isSelected, onClick = { onGroupSelected(group) })
+            RadioButton(
+                modifier = Modifier.size(24.dp),
+                selected = isSelected,
+                onClick = { onGroupSelected(group) })
+
         }
     }
 }

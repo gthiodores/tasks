@@ -48,3 +48,24 @@ fun TagChip(
         )
     }
 }
+
+@Composable
+fun TaskTagChip(
+    modifier: Modifier = Modifier,
+    name: String,
+    color: Color,
+) {
+    Box(
+        modifier = modifier
+            .clip(CircleShape)
+            .background(color.copy(alpha = 0.1f)),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            modifier = Modifier
+                .padding(horizontal = 12.dp, vertical = 4.dp),
+            text = "#$name",
+            color = color
+        )
+    }
+}

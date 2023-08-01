@@ -20,5 +20,6 @@ data class DomainTask(
         .time,
     val tags: List<DomainTag> = emptyList(),
     val isImportant: Boolean = false,
-    val group: DomainGroup
+    val group: DomainGroup,
+    val isFinished: Boolean = false
 )

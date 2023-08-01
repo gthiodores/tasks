@@ -14,7 +14,8 @@ data class DataTask(
     val timestamp: Timestamp,
     val tags: List<DataTag> = emptyList(),
     val isImportant: Boolean = false,
-    val group: DataGroup
+    val group: DataGroup,
+    val isFinished: Boolean = false,
 ) {
     fun toDomain(): DomainTask = DomainTask(
         id = id,
@@ -24,7 +25,8 @@ data class DataTask(
         time = timestamp.toInstant().toLocalDateTime(TimeZone.currentSystemDefault()).time,
         tags = tags.map { tag -> tag.toDomain() },
         isImportant = isImportant,
-        group = group.toDomain()
+        group = group.toDomain(),
+        isFinished = isFinished
     )
 
     companion object {
@@ -40,6 +42,7 @@ data class DataTask(
                     .fromInstant(
                         LocalDateTime(task.date, task.time).toInstant(TimeZone.currentSystemDefault())
                     ),
+                isFinished = task.isFinished
             )
         }
     }

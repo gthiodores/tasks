@@ -6,8 +6,11 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import sample.gthio.tasks.domain.model.toColor
 import sample.gthio.tasks.ui.model.UiGroup
 import sample.gthio.tasks.ui.theme.containerWhite
 
@@ -57,7 +61,8 @@ fun LazyListScope.homeGroups(
                     )
                 )
                 .background(containerWhite),
-            group = group
+            group = group,
+            onClick = { onEvent(HomeEvent.GroupItemClick(group.group)) }
         )
     }
 }
@@ -66,16 +71,24 @@ fun LazyListScope.homeGroups(
 fun HomeGroupItem(
     modifier: Modifier = Modifier,
     group: UiGroup,
+    onClick: () -> Unit,
 ) {
-    Box(
+    Row(
         modifier = modifier
             .fillMaxWidth()
+            .height(56.dp)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = rememberRipple(),
-                onClick = {  },
+                onClick = onClick,
             )
     ) {
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .width(8.dp)
+                .background(group.group.groupColor.toColor())
+        )
         Row(
             modifier = Modifier
                 .fillMaxWidth()

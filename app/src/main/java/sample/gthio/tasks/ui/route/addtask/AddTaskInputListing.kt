@@ -1,5 +1,8 @@
 package sample.gthio.tasks.ui.route.addtask
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -40,7 +43,11 @@ import kotlinx.datetime.atStartOfDayIn
 import sample.gthio.tasks.R
 import sample.gthio.tasks.domain.model.DomainTag
 import sample.gthio.tasks.ui.component.TagChip
+import sample.gthio.tasks.ui.extension.toDateString
+import sample.gthio.tasks.ui.extension.toTimeString
 import sample.gthio.tasks.ui.theme.containerWhite
+import sample.gthio.tasks.ui.theme.importantContainer
+import sample.gthio.tasks.ui.theme.importantIcon
 import sample.gthio.tasks.ui.theme.surfaceGray
 import sample.gthio.tasks.ui.theme.textGray
 
@@ -55,14 +62,14 @@ fun LazyListScope.addTaskInputListing(
                 .padding(top = 16.dp)
                 .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)),
             date = uiState.date,
-            result = "",
+            result = uiState.date.toDateString(),
             onDateChange = { dateInMillis -> onEvent(AddTaskEvent.SaveDate(dateInMillis))},
             isExpanded = uiState.isDateOpen,
             onClick = { onEvent(AddTaskEvent.OpenDate) },
         )
         AddTaskInputTime(
             modifier = Modifier,
-            result = "",
+            result = uiState.time.toTimeString(),
             isExpanded = uiState.isTimeOpen,
             onClick = { onEvent(AddTaskEvent.OpenTime) }
         )
@@ -100,6 +107,7 @@ fun AddTaskInputContainerExpanded(
     Column(
         modifier = modifier
             .fillMaxWidth()
+            .animateContentSize()
             .background(containerWhite)
     ) {
         AddTaskInputContainer(
@@ -109,14 +117,21 @@ fun AddTaskInputContainerExpanded(
             isExpanded = isExpanded,
             onClick = onClick
         )
-        if (isExpanded) {
-            content()
-            Divider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-                    .background(surfaceGray)
-            )
+        Crossfade(
+            targetState = isExpanded,
+            animationSpec = tween(durationMillis = 200)
+        ) { isExpanded ->
+            if (isExpanded) {
+                Column {
+                    content()
+                    Divider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                            .background(surfaceGray)
+                    )
+                }
+            }
         }
     }
 }
@@ -163,9 +178,17 @@ fun AddTaskInputContainer(
         ) {
             Text(text = result)
             if (isExpanded) {
-                Icon(Icons.Default.KeyboardArrowUp, contentDescription = "expand container icon")
+                Icon(
+                    modifier = Modifier.size(24.dp),
+                    imageVector = Icons.Default.KeyboardArrowUp,
+                    contentDescription = "expand container icon"
+                )
             } else {
-                Icon(Icons.Default.KeyboardArrowDown, contentDescription = "close container icon")
+                Icon(
+                    modifier = Modifier.size(24.dp),
+                    imageVector = Icons.Default.KeyboardArrowDown,
+                    contentDescription = "close container icon"
+                )
             }
         }
     }
@@ -194,7 +217,7 @@ fun AddTaskInputDate(
                 .atStartOfDayIn(TimeZone.currentSystemDefault())
                 .toEpochMilliseconds()
         )
-        LaunchedEffect(key1 = datePickerState) {
+        LaunchedEffect(key1 = datePickerState.selectedDateMillis) {
             if (datePickerState.selectedDateMillis != null) {
                 onDateChange(datePickerState.selectedDateMillis!!)
             }
@@ -292,8 +315,7 @@ fun AddTaskMarkAsImportantToggle(
         modifier = modifier
             .fillMaxWidth()
             .background(containerWhite)
-            .padding(16.dp)
-            .clickable { onClick() },
+            .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(
@@ -303,18 +325,22 @@ fun AddTaskMarkAsImportantToggle(
             Box(
                 modifier = Modifier
                     .size(32.dp)
-                    .background(color = surfaceGray, shape = CircleShape),
+                    .background(color = importantContainer, shape = CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     modifier = Modifier.size(18.dp),
                     painter = painterResource(id = R.drawable.baseline_star_24),
-                    tint = textGray,
+                    tint = importantIcon,
                     contentDescription = "input icon"
                 )
             }
             Text(text = "Mark as important")
         }
-        RadioButton(selected = isImportant, onClick = onClick)
+        RadioButton(
+            modifier = Modifier.size(24.dp),
+            selected = isImportant,
+            onClick = onClick
+        )
     }
 }

@@ -11,18 +11,13 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import sample.gthio.tasks.domain.model.DomainGroup
 import sample.gthio.tasks.domain.model.DomainTag
 import sample.gthio.tasks.domain.usecase.ObserveAllGroupUseCase
 import sample.gthio.tasks.domain.usecase.ObserveAllTagUseCase
 import sample.gthio.tasks.domain.usecase.ObserveAllTaskUseCase
 import sample.gthio.tasks.domain.usecase.ObserveTaskByTagUseCase
-import sample.gthio.tasks.domain.usecase.UpsertGroupUseCase
-import sample.gthio.tasks.domain.usecase.UpsertTagUseCase
-import sample.gthio.tasks.domain.usecase.UpsertTaskUseCase
 import sample.gthio.tasks.ui.model.UiGroup
-import java.util.UUID
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -32,9 +27,6 @@ class HomeViewModel @Inject constructor(
     private val observeTaskByTag: ObserveTaskByTagUseCase,
     observeAllGroup: ObserveAllGroupUseCase,
     observeAllTag: ObserveAllTagUseCase,
-    private val upsertTag: UpsertTagUseCase,
-    private val upsertGroup: UpsertGroupUseCase,
-    private val upsertTask: UpsertTaskUseCase,
 ) : ViewModel() {
 
     private val _navigation = MutableStateFlow<HomeNavigationTarget?>(null)
@@ -86,6 +78,11 @@ class HomeViewModel @Inject constructor(
             is HomeEvent.SelectTag -> handleSelectTag(event.tag)
             is HomeEvent.FabClick -> handleFabClick()
             is HomeEvent.AddClick -> handleAddClick()
+            HomeEvent.AllTasksClick -> handleAllTasksClick()
+            HomeEvent.ImportantClick -> handleImportantClick()
+            HomeEvent.TodayClick -> handleTodayClick()
+            is HomeEvent.GroupItemClick -> handleGroupItemClick(event.group)
+
         }
     }
 
@@ -98,19 +95,27 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun handleFabClick() {
-//        viewModelScope.launch {
-//            val random = UUID.randomUUID().toString().split("-")
-//            val tag = DomainTag(title = random[0])
-//            upsertTag(tag)
-//            upsertTask(DomainTask(title = random[1], group = _groups.first().last(), tags = listOf(tag)))
-//        }
         _navigation.update { HomeNavigationTarget.AddTask }
     }
 
     private fun handleAddClick() {
-        viewModelScope.launch {
-            upsertGroup(DomainGroup(title = UUID.randomUUID().toString().split("-")[0]))
-        }
+        _navigation.update { HomeNavigationTarget.AddGroup }
+    }
+
+    private fun handleAllTasksClick() {
+        _navigation.update { HomeNavigationTarget.TaskList("all_tasks", "") }
+    }
+
+    private fun handleGroupItemClick(group: DomainGroup) {
+        _navigation.update { HomeNavigationTarget.TaskList("", group.id.toString()) }
+    }
+
+    private fun handleImportantClick() {
+        _navigation.update { HomeNavigationTarget.TaskList("important", "") }
+    }
+
+    private fun handleTodayClick() {
+        _navigation.update { HomeNavigationTarget.TaskList("today", "") }
     }
 
     fun homeNavigationDone() { _navigation.update { null } }

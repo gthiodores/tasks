@@ -1,6 +1,7 @@
 package sample.gthio.tasks.ui.route.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,21 +23,26 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import sample.gthio.tasks.R
 import sample.gthio.tasks.ui.theme.allTaskContainer
 import sample.gthio.tasks.ui.theme.allTaskIcon
+import sample.gthio.tasks.ui.theme.containerWhite
 import sample.gthio.tasks.ui.theme.importantContainer
 import sample.gthio.tasks.ui.theme.importantIcon
 import sample.gthio.tasks.ui.theme.scheduledContainer
 import sample.gthio.tasks.ui.theme.scheduledIcon
-import sample.gthio.tasks.ui.theme.surfaceGray
 import sample.gthio.tasks.ui.theme.textGray
 import sample.gthio.tasks.ui.theme.todayContainer
 import sample.gthio.tasks.ui.theme.todayIcon
 
 @Composable
 fun HomeMenu(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    uiState: HomeUiState,
+    onEvent: (HomeEvent) -> Unit
 ) {
     Row(
         modifier = modifier
@@ -56,14 +62,16 @@ fun HomeMenu(
                 iconColor = scheduledIcon,
                 containerColor = scheduledContainer,
                 isLarge = true,
+                onClick = {}
             )
             HomeMenuGrid(
                 name = "Important",
-                quantity = 0,
+                quantity = uiState.tasks.count { task -> task.isImportant },
                 icon = R.drawable.baseline_star_24,
                 iconColor = importantIcon,
                 containerColor = importantContainer,
                 isLarge = false,
+                onClick = { onEvent(HomeEvent.ImportantClick) }
             )
         }
         Column(
@@ -73,19 +81,22 @@ fun HomeMenu(
         ) {
             HomeMenuGrid(
                 name = "Today",
-                quantity = 0,
+                quantity = uiState.tasks.count { task -> task.date == Clock.System.now().toLocalDateTime(
+                    TimeZone.currentSystemDefault()).date },
                 icon = R.drawable.baseline_calendar_today_24,
                 iconColor = todayIcon,
                 containerColor = todayContainer,
                 isLarge = false,
+                onClick = { onEvent(HomeEvent.TodayClick) }
             )
             HomeMenuGrid(
                 name = "All Tasks",
-                quantity = 0,
+                quantity = uiState.tasks.size,
                 icon = R.drawable.baseline_folder_open_24,
                 iconColor = allTaskIcon,
                 containerColor = allTaskContainer,
                 isLarge = true,
+                onClick = { onEvent(HomeEvent.AllTasksClick) }
             )
         }
     }
@@ -100,6 +111,7 @@ fun HomeMenuGrid(
     iconColor: Color,
     containerColor: Color,
     isLarge: Boolean,
+    onClick: () -> Unit,
 ) {
     Box(
         modifier = modifier
@@ -107,6 +119,7 @@ fun HomeMenuGrid(
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .background(containerColor)
+            .clickable { onClick() }
     ) {
         Box(
             modifier = Modifier
@@ -117,7 +130,7 @@ fun HomeMenuGrid(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(surfaceGray)
+                    .background(containerWhite)
                     .align(Alignment.TopStart),
                 contentAlignment = Alignment.Center,
             ) {

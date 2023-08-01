@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
@@ -31,12 +33,28 @@ class AddTaskViewModel @Inject constructor(
     observeAllTag: ObserveAllTagUseCase
 ): ViewModel() {
 
-    val groups = observeAllGroup()
+    private val _groups = observeAllGroup()
 
-    val tags = observeAllTag()
+    private val _tags = observeAllTag()
 
-    private val _state = MutableStateFlow(AddTaskUiState())
-    val uiState = _state.asStateFlow()
+    private val _inputState = MutableStateFlow(AddTaskInputState())
+
+    val uiState = combine(
+        _groups,
+        _tags,
+        _inputState
+    ) { groups, tags, inputState ->
+       AddTaskUiState(
+           groups = groups,
+           tags = tags
+       ).fromInputState(inputState)
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        AddTaskUiState()
+    )
+
+
 
     fun onEvent(event: AddTaskEvent) {
         when (event) {
@@ -54,78 +72,81 @@ class AddTaskViewModel @Inject constructor(
             AddTaskEvent.OpenTime -> handleOpenTime()
             is AddTaskEvent.SaveTime -> handleSaveTime(event.time)
             is AddTaskEvent.SaveDate -> handleSaveDate(event.dateInMillis)
+            AddTaskEvent.DismissTime -> handleDismissTime()
         }
     }
 
     private fun handleBackPressed() {
-        _state.update { old -> old.copy(shouldNavigateBack = true) }
+        _inputState.update { old -> old.copy(shouldNavigateBack = true) }
     }
 
     private fun handleTitleValueChange(value: String) {
-        _state.update { old -> old.copy(title = value) }
+        _inputState.update { old -> old.copy(title = value) }
     }
 
     private fun handleDescriptionValueChange(value: String) {
-        _state.update { old -> old.copy(description = value) }
+        _inputState.update { old -> old.copy(description = value) }
     }
 
     private fun handleImportantSelect() {
-        _state.update { old -> old.copy(isImportant = !old.isImportant) }
+        _inputState.update { old -> old.copy(isImportant = !old.isImportant) }
     }
 
     private fun handleGroupSelect(group: DomainGroup) {
-        _state.update { old -> old.copy(selectedGroup = group) }
+        _inputState.update { old -> old.copy(selectedGroup = group) }
     }
 
     private fun handleTagSelect(tag: DomainTag) {
-        _state.update { old ->
+        _inputState.update { old ->
             old.copy(selectedTags = old.selectedTags
                 .addOrRemoveDuplicate(tag) { a, b -> a == b } )
         }
     }
 
     private fun handleNewTagValueChange(newTag: String) {
-        _state.update { old -> old.copy(newTag = newTag) }
+        _inputState.update { old -> old.copy(newTag = newTag) }
     }
 
     private fun handleNewTagAddButtonClick(newTag: String) {
         viewModelScope.launch {
             upsertTag(tag = DomainTag(title = newTag))
-            _state.update { old -> old.copy(newTag = "") }
+            _inputState.update { old -> old.copy(newTag = "") }
         }
     }
 
     private fun handleSaveButtonClick() {
         viewModelScope.launch {
-            if (_state.value.selectedGroup != null) {
+            if (_inputState.value.selectedGroup != null) {
                 upsertTask(
                     DomainTask(
-                        title = _state.value.title,
-                        description = if (_state.value.description != "") _state.value.description else null,
-                        tags = _state.value.selectedTags,
-                        isImportant = _state.value.isImportant,
-                        group = _state.value.selectedGroup!!,
+                        title = _inputState.value.title,
+                        description = if (_inputState.value.description != "") _inputState.value.description else null,
+                        date = _inputState.value.date,
+                        time = _inputState.value.time,
+                        tags = _inputState.value.selectedTags,
+                        isImportant = _inputState.value.isImportant,
+                        group = _inputState.value.selectedGroup!!,
                     )
                 )
-                _state.update { old -> old.copy(shouldNavigateBack = true) }
+                _inputState.update { old -> old.copy(shouldNavigateBack = true) }
             }
         }
     }
 
     private fun handleOpenDate() {
-        _state.update { old -> old.copy(isDateOpen = !old.isDateOpen) }
+        _inputState.update { old -> old.copy(isDateOpen = !old.isDateOpen) }
     }
 
     private fun handleOpenTag() {
-        _state.update { old -> old.copy(isTagOpen = !old.isTagOpen) }
+        _inputState.update { old -> old.copy(isTagOpen = !old.isTagOpen) }
     }
 
     private fun handleOpenTime() {
-        _state.update { old -> old.copy(isTimeOpen = true) }
+        _inputState.update { old -> old.copy(isTimeOpen = true) }
     }
 
     private fun handleSaveTime(time: LocalTime) {
-        _state.update { old ->
+        _inputState.update { old ->
             old.copy(
                 isTimeOpen = false,
                 time = time,
@@ -134,7 +155,7 @@ class AddTaskViewModel @Inject constructor(
     }
 
     private fun handleSaveDate(long: Long) {
-        _state.update { old ->
+        _inputState.update { old ->
             old.copy(
                 date = Instant
                     .fromEpochMilliseconds(long)
@@ -144,5 +165,9 @@ class AddTaskViewModel @Inject constructor(
         }
     }
 
-    fun addTaskNavigationDone() { _state.update { old -> old.copy(shouldNavigateBack = false) } }
+    private fun handleDismissTime() {
+        _inputState.update { old -> old.copy(isTimeOpen = false) }
+    }
+
+    fun addTaskNavigationDone() { _inputState.update { old -> old.copy(shouldNavigateBack = false) } }
 }

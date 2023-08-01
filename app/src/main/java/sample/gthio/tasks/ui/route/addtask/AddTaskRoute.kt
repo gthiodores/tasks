@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -14,18 +15,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SheetValue
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TimePicker
-import androidx.compose.material3.TimePickerState
-import androidx.compose.material3.rememberBottomSheetScaffoldState
-import androidx.compose.material3.rememberStandardBottomSheetState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -49,18 +47,11 @@ fun AddTaskRoute(
     viewModel: AddTaskViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val groups by viewModel.groups.collectAsState(initial = emptyList())
-    val tags by viewModel.tags.collectAsState(initial = emptyList())
 
-    val bottomSheetState = rememberStandardBottomSheetState(
-        initialValue = SheetValue.Hidden,
-        skipHiddenState = false
+    val bottomSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
     )
-    val timePickerState = rememberTimePickerState()
     val scope = rememberCoroutineScope()
-    val scaffoldState = rememberBottomSheetScaffoldState(
-        bottomSheetState = bottomSheetState
-    )
 
     LaunchedEffect(key1 = uiState.shouldNavigateBack) {
         if (uiState.shouldNavigateBack)  {
@@ -71,15 +62,26 @@ fun AddTaskRoute(
 
     LaunchedEffect(key1 = uiState.isTimeOpen) {
         scope.launch {
-            if (uiState.isTimeOpen) {
-                scaffoldState.bottomSheetState.expand()
-            } else {
-                scaffoldState.bottomSheetState.hide()
+            when (uiState.isTimeOpen) {
+                true -> bottomSheetState.expand()
+                false -> bottomSheetState.hide()
             }
         }
     }
 
-    BottomSheetScaffold(
+    if (uiState.isTimeOpen) {
+        ModalBottomSheet(
+            sheetState = bottomSheetState,
+            onDismissRequest = { viewModel.onEvent(AddTaskEvent.DismissTime) }
+        ) {
+            AddTaskBottomSheet(
+                time = uiState.time,
+                onSaveButtonClick = { time -> viewModel.onEvent(AddTaskEvent.SaveTime(time)) }
+            )
+        }
+    }
+
+    Scaffold(
         topBar = {
             TaskCenterAppBar(
                 title = { Text("Add Task") },
@@ -88,22 +90,9 @@ fun AddTaskRoute(
                         Icon(Icons.Default.ArrowBack, contentDescription = "nav back stack")
                     }
                 },
-                actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(Icons.Default.Delete, contentDescription = "dismiss add task")
-                    }
-                }
             )
         },
         containerColor = surfaceGray,
-        scaffoldState = scaffoldState,
-        sheetPeekHeight = 0.dp,
-        sheetContent = {
-            AddTaskBottomSheet(
-                timePickerState = timePickerState,
-                onSaveButtonClick = { time -> viewModel.onEvent(AddTaskEvent.SaveTime(time)) }
-            )
-        }
     ) { contentPadding ->
         LazyColumn(
             modifier = Modifier
@@ -127,12 +116,12 @@ fun AddTaskRoute(
                 )
             }
             addTaskInputListing(
-                tags = tags,
+                tags = uiState.tags,
                 uiState = uiState,
                 onEvent = viewModel::onEvent
             )
             addTaskGroupListing(
-                groups = groups,
+                groups = uiState.groups,
                 uiState = uiState,
                 onEvent = viewModel::onEvent
             )
@@ -153,9 +142,14 @@ fun AddTaskRoute(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTaskBottomSheet(
-    timePickerState: TimePickerState,
+    time: LocalTime,
     onSaveButtonClick: (LocalTime) -> Unit
 ) {
+    val timePickerState = rememberTimePickerState(
+        initialHour = time.hour,
+        initialMinute = time.minute,
+        is24Hour = true
+    )
     Column(
         Modifier
             .fillMaxWidth(),
@@ -173,6 +167,7 @@ fun AddTaskBottomSheet(
                 )
             }
         )
+        Spacer(modifier = Modifier.padding(16.dp))
     }
 }
 
