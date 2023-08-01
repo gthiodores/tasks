@@ -14,4 +14,10 @@ interface TaskRepository {
     suspend fun updateTask(task: DomainTask)
 
     fun observeTaskByTagId(id: UUID): Flow<List<DomainTask>>
+
+    fun observeTask(id: UUID): Flow<DomainTask?>
+
+    fun observeTaskByTagAndGroup(tagId: UUID, groupId: UUID): Flow<List<DomainTask>>
+
+    fun observeTaskByGroup(groupId: UUID): Flow<List<DomainTask>>
 }

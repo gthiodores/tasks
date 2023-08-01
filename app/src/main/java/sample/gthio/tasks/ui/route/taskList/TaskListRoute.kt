@@ -5,32 +5,14 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -48,11 +30,7 @@ import sample.gthio.tasks.domain.model.toColor
 import sample.gthio.tasks.ui.component.TaskTagChip
 import sample.gthio.tasks.ui.extension.toDateString
 import sample.gthio.tasks.ui.extension.toTimeString
-import sample.gthio.tasks.ui.theme.containerWhite
-import sample.gthio.tasks.ui.theme.importantContainer
-import sample.gthio.tasks.ui.theme.importantIcon
-import sample.gthio.tasks.ui.theme.surfaceGray
-import sample.gthio.tasks.ui.theme.textGray
+import sample.gthio.tasks.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -71,9 +49,9 @@ fun TaskListRoute(
             TaskCenterAppBar(
                 title = { Text(text = "All tasks") },
                 navigationIcon = {
-                     IconButton(onClick = { viewModel.onEvent(TaskListEvent.BackPressed) }) {
-                         Icon(Icons.Default.ArrowBack, contentDescription = "nav back stack")
-                     }
+                    IconButton(onClick = { viewModel.onEvent(TaskListEvent.BackPressed) }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "nav back stack")
+                    }
                 },
                 actions = {
                     IconButton(onClick = { /*TODO*/ }) {
@@ -94,18 +72,40 @@ fun TaskListRoute(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item { Spacer(modifier = Modifier.padding(0.dp)) }
-            uiState.tasks.forEach { (date, tasks) ->
-                if (tasks.isNotEmpty()) {
+            uiState
+                .tasks
+                .groupBy { task -> task.group.title }
+                .forEach { (key, entry) ->
                     stickyHeader {
-                        TaskListItemHeader(title = date)
+                        TaskListItemHeader(title = key)
                     }
-                    items(items = tasks) { task ->
+                    items(items = entry, key = { task -> task.id }) { task ->
                         TaskListItem(
+                            modifier = Modifier.animateItemPlacement(),
                             task = task,
-                            onTaskFinishClick = { _task -> viewModel.onEvent(TaskListEvent.TaskFinishClick(_task))}
+                            onTaskFinishClick = { _task -> viewModel.onEvent(TaskListEvent.TaskFinishClick(_task)) }
                         )
                     }
                 }
+
+            if (uiState.completedTasks.isNotEmpty()) {
+                item { Text("Completed tasks", style = MaterialTheme.typography.titleLarge) }
+
+                uiState
+                    .completedTasks
+                    .groupBy { task -> task.group.title }
+                    .forEach { (key, entry) ->
+                        stickyHeader {
+                            TaskListItemHeader(title = key)
+                        }
+                        items(items = entry, key = { task -> task.id }) { task ->
+                            TaskListItem(
+                                modifier = Modifier.animateItemPlacement(),
+                                task = task,
+                                onTaskFinishClick = { _task -> viewModel.onEvent(TaskListEvent.TaskFinishClick(_task)) }
+                            )
+                        }
+                    }
             }
         }
     }

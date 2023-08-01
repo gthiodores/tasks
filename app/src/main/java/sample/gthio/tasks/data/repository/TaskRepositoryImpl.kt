@@ -8,7 +8,7 @@ import sample.gthio.tasks.data.model.DataTask
 import sample.gthio.tasks.data.source.TaskLocalSource
 import sample.gthio.tasks.domain.model.DomainTask
 import sample.gthio.tasks.domain.repository.TaskRepository
-import java.util.UUID
+import java.util.*
 
 fun defaultTaskRepository(taskSource: TaskLocalSource): TaskRepository = object : TaskRepository {
     override val tasks: Flow<List<DomainTask>>
@@ -31,8 +31,28 @@ fun defaultTaskRepository(taskSource: TaskLocalSource): TaskRepository = object 
     override fun observeTaskByTagId(id: UUID): Flow<List<DomainTask>> {
         return taskSource
             .observeTaskByTagId(id)
-            .map { tasks -> tasks.map { it.toDomain() } }
+            .map { tasks -> tasks.map(DataTask::toDomain) }
             .flowOn(Dispatchers.IO)
     }
 
+    override fun observeTask(id: UUID): Flow<DomainTask?> {
+        return taskSource
+            .observeTask(id)
+            .map { task -> task?.toDomain() }
+            .flowOn(Dispatchers.IO)
+    }
+
+    override fun observeTaskByTagAndGroup(tagId: UUID, groupId: UUID): Flow<List<DomainTask>> {
+        return taskSource
+            .observeTaskByTagAndGroup(tagId, groupId)
+            .map { tasks -> tasks.map(DataTask::toDomain) }
+            .flowOn(Dispatchers.IO)
+    }
+
+    override fun observeTaskByGroup(groupId: UUID): Flow<List<DomainTask>> {
+        return taskSource
+            .observeTaskByGroup(groupId)
+            .map { tasks -> tasks.map(DataTask::toDomain) }
+            .flowOn(Dispatchers.IO)
+    }
 }
