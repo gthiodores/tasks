@@ -2,15 +2,15 @@ package sample.gthio.tasks.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import sample.gthio.tasks.ui.route.addgroup.AddGroupRoute
 import sample.gthio.tasks.ui.route.addtask.AddTaskRoute
 import sample.gthio.tasks.ui.route.home.HomeRoute
-import sample.gthio.tasks.ui.route.taskList.TaskListRoute
+import sample.gthio.tasks.ui.route.taskList.navigateToTaskList
+import sample.gthio.tasks.ui.route.taskList.taskListNavigation
+import java.util.*
 
 @Composable
 fun AppNavigator(
@@ -26,8 +26,10 @@ fun AppNavigator(
                 toAddTask = { navController.navigate(route = Screen.AddTask.route) },
                 toAddGroup = { navController.navigate(route = Screen.AddGroup.route) },
                 toTaskList = { query, groupId ->
-                    navController
-                        .navigate(route = Screen.TaskList.route.plus("/?query=$query&groupId=$groupId"))
+                    navController.navigateToTaskList(
+                        groupId = groupId?.let { UUID.fromString(groupId) },
+                        tagId = null,
+                    )
                 }
             )
         }
@@ -41,22 +43,7 @@ fun AppNavigator(
                 onBack = { navController.navigateUp() }
             )
         }
-        composable(
-            route = Screen.TaskList.route.plus("/?query={query}&groupId={groupId}"),
-            arguments = listOf(
-                navArgument("query") {
-                    type = NavType.StringType
-                    defaultValue = ""
-                },
-                navArgument("groupId") {
-                    type = NavType.StringType
-                    defaultValue = ""
-                }
-            )
-        ) {
-            TaskListRoute(
-                onBack = { navController.navigateUp() }
-            )
-        }
+
+        taskListNavigation(onBack = navController::navigateUp)
     }
 }

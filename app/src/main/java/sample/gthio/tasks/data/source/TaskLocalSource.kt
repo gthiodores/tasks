@@ -1,12 +1,7 @@
 package sample.gthio.tasks.data.source
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import sample.gthio.tasks.data.model.DataTask
 import sample.gthio.tasks.domain.model.DomainTask
 import java.util.*
@@ -21,6 +16,12 @@ interface TaskLocalSource {
     suspend fun update(task: DomainTask)
 
     fun observeTaskByTagId(id: UUID): Flow<List<DataTask>>
+
+    fun observeTask(id: UUID): Flow<DataTask?>
+
+    fun observeTaskByTagAndGroup(tagId: UUID, groupId: UUID): Flow<List<DataTask>>
+
+    fun observeTaskByGroup(groupId: UUID): Flow<List<DataTask>>
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -41,10 +42,28 @@ fun inMemoryTaskSource(): TaskLocalSource = object : TaskLocalSource {
     }
 
     override fun observeTaskByTagId(id: UUID): Flow<List<DataTask>> {
-        val tasksWithTag = tasks
-            .flatMapLatest { tasks ->
-                flowOf(tasks.filter { task -> task.tags.any { tag -> tag.id == id } })
+        return tasks
+            .map { taskList ->
+                taskList.filter { task -> task.tags.any { tag -> tag.id == id } }
             }
-        return tasksWithTag
+    }
+
+    override fun observeTask(id: UUID): Flow<DataTask?> {
+        return tasks
+            .map { taskList -> taskList.firstOrNull { item -> item.id == id } }
+    }
+
+    override fun observeTaskByTagAndGroup(tagId: UUID, groupId: UUID): Flow<List<DataTask>> {
+        return tasks
+            .map { taskList ->
+                taskList.filter { task ->
+                    task.tags.any { tag -> tag.id == tagId } && task.group.id == groupId
+                }
+            }
+    }
+
+    override fun observeTaskByGroup(groupId: UUID): Flow<List<DataTask>> {
+        return tasks
+            .map { taskList -> taskList.filter { task -> task.group.id == groupId } }
     }
 }
