@@ -42,7 +42,7 @@ fun NavController.navigateToTaskList(
     navOptions: NavOptions? = null,
 ) {
     val route = StringBuilder(Screen.TaskList.route)
-        .letAppend(filterQuery) { value -> append("?filterQuery=${value.arg}") }
+        .append("?filterQuery=${filterQuery?.arg ?: TaskFilterQuery.ALL.arg}")
         .letAppend(groupId) { value -> append("&groupId=$value") }
         .letAppend(tagId) { value -> append("&tagId=$value") }
         .toString()
