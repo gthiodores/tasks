@@ -30,6 +30,7 @@ import sample.gthio.tasks.domain.model.toColor
 import sample.gthio.tasks.ui.component.TagChip
 import sample.gthio.tasks.ui.route.addtask.AddTaskSaveButton
 import sample.gthio.tasks.ui.theme.containerWhite
+import java.util.UUID
 
 @Composable
 fun TaskListFilterBottomSheet(
@@ -41,7 +42,6 @@ fun TaskListFilterBottomSheet(
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         taskListTagChipGroup(uiState = uiState, onEvent = onEvent)
         taskListGroupList(uiState = uiState, onEvent = onEvent)
@@ -72,7 +72,7 @@ fun LazyListScope.taskListGroupList(
                 )
                 .background(containerWhite),
             group = group,
-            isSelected = uiState.selectedGroupId == group.id,
+            isSelected = uiState.selectedGroupId.any { groupId -> groupId == group.id },
             onClick = { onEvent(TaskListEvent.FilterByGroup(group.id)) }
         )
     }
@@ -145,13 +145,13 @@ fun LazyListScope.taskListTagChipGroup(
         ) {
             TagChip(
                 name = "All Tags",
-                isSelected = uiState.selectedTagId == null,
-                onClick = { onEvent(TaskListEvent.FilterByTag(null)) },
+                isSelected = uiState.selectedTagId == emptyList<UUID>(),
+                onClick = { onEvent(TaskListEvent.FilterAllTag) },
             )
             uiState.tags.forEach { tag ->
                 TagChip(
                     name = "#${tag.title}",
-                    isSelected = uiState.selectedTagId == tag.id,
+                    isSelected = uiState.selectedTagId.any { tagId -> tagId == tag.id },
                     onClick = { onEvent(TaskListEvent.FilterByTag(tag.id)) }
                 )
             }

@@ -67,4 +67,10 @@ object UseCaseModule {
         taskRepository: TaskRepository
     ): ObserveAllTaskByGroupAndTagUseCase =
         ObserveAllTaskByGroupAndTagUseCase(taskRepository)
+
+    @Provides
+    fun provideGetTaskByQueries(
+        taskRepository: TaskRepository
+    ): ObserveTaskByQueriesUseCase =
+        ObserveTaskByQueriesUseCase(taskRepository)
 }

@@ -2,8 +2,13 @@ package sample.gthio.tasks.data.source
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toKotlinLocalDate
+import kotlinx.datetime.toLocalDateTime
 import sample.gthio.tasks.data.model.DataTask
 import sample.gthio.tasks.domain.model.DomainTask
+import sample.gthio.tasks.domain.model.TaskQuery
+import java.time.LocalDate
 import java.util.*
 
 interface TaskLocalSource {
@@ -22,6 +27,8 @@ interface TaskLocalSource {
     fun observeTaskByTagAndGroup(tagId: UUID, groupId: UUID): Flow<List<DataTask>>
 
     fun observeTaskByGroup(groupId: UUID): Flow<List<DataTask>>
+
+    fun observeTaskByQueries(queries: List<TaskQuery>): Flow<List<DataTask>>
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -65,5 +72,27 @@ fun inMemoryTaskSource(): TaskLocalSource = object : TaskLocalSource {
     override fun observeTaskByGroup(groupId: UUID): Flow<List<DataTask>> {
         return tasks
             .map { taskList -> taskList.filter { task -> task.group.id == groupId } }
+    }
+
+    override fun observeTaskByQueries(queries: List<TaskQuery>): Flow<List<DataTask>> {
+        return tasks
+            .map { taskList ->
+                var result = taskList
+                queries.forEach { query ->
+                    result = when (query) {
+                        TaskQuery.isToday -> result.filter { task ->
+                            task.timestamp.toInstant()
+                                .toLocalDateTime(TimeZone.currentSystemDefault()).date == LocalDate.now()
+                                .toKotlinLocalDate()
+                        }
+
+                        TaskQuery.IsImportant -> result.filter { task -> task.isImportant }
+                        is TaskQuery.HasGroupWithId -> result.filter { task -> task.group.id == query.id }
+                        is TaskQuery.HasTagWithId -> result.filter { task -> task.tags.any { tag -> tag.id == query.id } }
+                    }
+                }
+                return@map result
+            }
+
     }
 }

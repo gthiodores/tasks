@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.map
 import sample.gthio.tasks.data.model.DataTask
 import sample.gthio.tasks.data.source.TaskLocalSource
 import sample.gthio.tasks.domain.model.DomainTask
+import sample.gthio.tasks.domain.model.TaskQuery
 import sample.gthio.tasks.domain.repository.TaskRepository
 import java.util.*
 
@@ -52,6 +53,13 @@ fun defaultTaskRepository(taskSource: TaskLocalSource): TaskRepository = object 
     override fun observeTaskByGroup(groupId: UUID): Flow<List<DomainTask>> {
         return taskSource
             .observeTaskByGroup(groupId)
+            .map { tasks -> tasks.map(DataTask::toDomain) }
+            .flowOn(Dispatchers.IO)
+    }
+
+    override fun observeTaskByQueries(queries: List<TaskQuery>): Flow<List<DomainTask>> {
+        return taskSource
+            .observeTaskByQueries(queries)
             .map { tasks -> tasks.map(DataTask::toDomain) }
             .flowOn(Dispatchers.IO)
     }
