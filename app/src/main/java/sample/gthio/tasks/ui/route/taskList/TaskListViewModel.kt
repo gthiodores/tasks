@@ -7,6 +7,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import sample.gthio.tasks.domain.model.DomainTask
 import sample.gthio.tasks.domain.usecase.*
 import java.util.*
@@ -74,14 +77,17 @@ class TaskListViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val queryFromArgs = savedStateHandle
-        .getStateFlow<String?>("query", null)
+        .getStateFlow<String?>("filterQuery", null)
         .map { query -> TaskFilterQuery.fromArg(query.orEmpty()) }
+
     private val groupIdFromArgs = savedStateHandle
         .getStateFlow<String?>("groupId", null)
         .map { groupId -> groupId?.let(UUID::fromString) }
+
     private val tagIdFromArgs = savedStateHandle
         .getStateFlow<String?>("tagId", null)
         .map { tagId -> tagId?.let(UUID::fromString) }
+
     private val filterArg = combine(
         queryFromArgs,
         groupIdFromArgs,
@@ -97,10 +103,19 @@ class TaskListViewModel @Inject constructor(
 
     private val _tasks = filterArg.flatMapLatest { query ->
         when (query) {
-            is TaskListQuery.QueryByGroup -> observeAllTaskByGroup(query.groupId)
-            is TaskListQuery.QueryByGroupAndTag -> observeAllTaskByGroupAndTag(query.groupId, query.tagId)
-            is TaskListQuery.QueryByNone -> observeAllTask()
-            is TaskListQuery.QueryByTag -> observeTaskByTag(query.tagId)
+            is TaskListQuery.QueryByGroup -> observeAllTaskByGroup(query.groupId).map { tasks -> tasks.filterTasks(query.filter) }
+            is TaskListQuery.QueryByGroupAndTag -> observeAllTaskByGroupAndTag(query.groupId, query.tagId).map { tasks -> tasks.filterTasks(query.filter) }
+            is TaskListQuery.QueryByNone -> observeAllTask().map { tasks -> tasks.filterTasks(query.filter) }
+            is TaskListQuery.QueryByTag -> observeTaskByTag(query.tagId).map { tasks -> tasks.filterTasks(query.filter) }
+        }
+    }
+
+    private fun List<DomainTask>.filterTasks(query: TaskFilterQuery): List<DomainTask> {
+        return when (query) {
+            TaskFilterQuery.ALL -> this
+            TaskFilterQuery.IMPORTANT -> this.filter { task -> task.isImportant }
+            TaskFilterQuery.TODAY -> this.filter { task -> task.date == Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date }
+            TaskFilterQuery.SCHEDULED -> this
         }
     }
 
@@ -148,7 +163,7 @@ class TaskListViewModel @Inject constructor(
     }
 
     private fun handleFilterByGroup(groupId: UUID?) {
-        savedStateHandle.set("groupId", groupId?.toString())
+        savedStateHandle["groupId"] = groupId?.toString()
     }
 
     private fun handleBackPressed() {

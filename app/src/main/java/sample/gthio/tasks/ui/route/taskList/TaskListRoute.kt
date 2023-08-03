@@ -1,6 +1,7 @@
 package sample.gthio.tasks.ui.route.taskList
 
 import TaskCenterAppBar
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -81,7 +82,7 @@ fun TaskListRoute(
                     }
                     items(items = entry, key = { task -> task.id }) { task ->
                         TaskListItem(
-                            modifier = Modifier.animateItemPlacement(),
+                            modifier = Modifier.animateItemPlacement(animationSpec = tween(1000)),
                             task = task,
                             onTaskFinishClick = { _task -> viewModel.onEvent(TaskListEvent.TaskFinishClick(_task)) }
                         )

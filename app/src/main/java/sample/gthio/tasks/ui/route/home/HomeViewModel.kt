@@ -18,6 +18,7 @@ import sample.gthio.tasks.domain.usecase.ObserveAllTagUseCase
 import sample.gthio.tasks.domain.usecase.ObserveAllTaskUseCase
 import sample.gthio.tasks.domain.usecase.ObserveTaskByTagUseCase
 import sample.gthio.tasks.ui.model.UiGroup
+import sample.gthio.tasks.ui.route.taskList.TaskFilterQuery
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -103,19 +104,19 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun handleAllTasksClick() {
-        _navigation.update { HomeNavigationTarget.TaskList("all_tasks", "") }
+        _navigation.update { HomeNavigationTarget.TaskList(TaskFilterQuery.ALL, null, null) }
     }
 
     private fun handleGroupItemClick(group: DomainGroup) {
-        _navigation.update { HomeNavigationTarget.TaskList("", group.id.toString()) }
+        _navigation.update { HomeNavigationTarget.TaskList(null, group.id, null) }
     }
 
     private fun handleImportantClick() {
-        _navigation.update { HomeNavigationTarget.TaskList("important", "") }
+        _navigation.update { HomeNavigationTarget.TaskList(TaskFilterQuery.IMPORTANT, null, null) }
     }
 
     private fun handleTodayClick() {
-        _navigation.update { HomeNavigationTarget.TaskList("today", "") }
+        _navigation.update { HomeNavigationTarget.TaskList(TaskFilterQuery.TODAY, null, null) }
     }
 
     fun homeNavigationDone() { _navigation.update { null } }

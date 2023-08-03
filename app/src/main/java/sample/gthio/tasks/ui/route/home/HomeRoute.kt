@@ -24,9 +24,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import sample.gthio.tasks.R
+import sample.gthio.tasks.ui.route.taskList.TaskFilterQuery
 import sample.gthio.tasks.ui.theme.containerWhite
 import sample.gthio.tasks.ui.theme.surfaceGray
 import sample.gthio.tasks.ui.theme.textBlack
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,7 +36,7 @@ fun HomeRoute(
     viewModel: HomeViewModel = hiltViewModel(),
     toAddTask: () -> Unit,
     toAddGroup: () -> Unit,
-    toTaskList: (String?, String?) -> Unit,
+    toTaskList: (TaskFilterQuery?, UUID?, UUID?) -> Unit,
 ) {
     val navigation by viewModel.navigationTarget.collectAsState()
 
@@ -46,7 +48,7 @@ fun HomeRoute(
                 when (target) {
                     is HomeNavigationTarget.AddTask -> toAddTask()
                     is HomeNavigationTarget.AddGroup -> toAddGroup()
-                    is HomeNavigationTarget.TaskList -> toTaskList(target.query, target.groupId)
+                    is HomeNavigationTarget.TaskList -> toTaskList(target.query, target.groupId, target.tagId)
                 }
                 viewModel.homeNavigationDone()
             }
