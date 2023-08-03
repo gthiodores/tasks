@@ -47,7 +47,7 @@ fun NavController.navigateToTaskList(
         .letAppend(tagId) { value -> append("&tagId=$value") }
         .toString()
 
-    this.navigate(
+    navigate(
         route = route,
         navOptions = navOptions
     )

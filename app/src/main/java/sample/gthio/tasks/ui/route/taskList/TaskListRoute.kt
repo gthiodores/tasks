@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import kotlinx.coroutines.launch
 import sample.gthio.tasks.R
 import sample.gthio.tasks.domain.model.DomainTask
 import sample.gthio.tasks.domain.model.toColor
@@ -41,8 +43,31 @@ fun TaskListRoute(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    val bottomSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
+    val scope = rememberCoroutineScope()
+
     LaunchedEffect(key1 = uiState.shouldNavigateBack) {
         if (uiState.shouldNavigateBack) onBack()
+    }
+
+    LaunchedEffect(key1 = uiState.isFilterOpen) {
+        scope.launch {
+            when (uiState.isFilterOpen) {
+                true -> bottomSheetState.expand()
+                false -> bottomSheetState.hide()
+            }
+        }
+    }
+
+    if (uiState.isFilterOpen) {
+        ModalBottomSheet(
+            sheetState = bottomSheetState,
+            onDismissRequest = { viewModel.onEvent(TaskListEvent.DismissFilter) }
+        ) {
+            TaskListFilterBottomSheet(uiState = uiState, onEvent = viewModel::onEvent)
+        }
     }
 
     Scaffold(
@@ -55,7 +80,7 @@ fun TaskListRoute(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = { viewModel.onEvent(TaskListEvent.FilterButtonClick) }) {
                         Icon(
                             painter = painterResource(id = R.drawable.baseline_filter_list_24),
                             contentDescription = "filter list"

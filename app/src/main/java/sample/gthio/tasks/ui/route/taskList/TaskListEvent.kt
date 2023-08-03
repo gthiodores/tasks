@@ -8,5 +8,8 @@ sealed interface TaskListEvent {
     data class TaskFinishClick(val task: DomainTask) : TaskListEvent
     data class FilterByTag(val tagId: UUID?) : TaskListEvent
     data class FilterByGroup(val groupId: UUID?) : TaskListEvent
+    object FilterButtonClick: TaskListEvent
+    object DismissFilter: TaskListEvent
+    object SaveFilter: TaskListEvent
     object ResetFilter : TaskListEvent
 }

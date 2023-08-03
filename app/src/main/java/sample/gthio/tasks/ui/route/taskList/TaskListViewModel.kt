@@ -72,6 +72,7 @@ class TaskListViewModel @Inject constructor(
     observeAllTaskByGroup: ObserveAllTaskByGroupUseCase,
     observeAllTaskByGroupAndTag: ObserveAllTaskByGroupAndTagUseCase,
     observeAllGroup: ObserveAllGroupUseCase,
+    observeAllTag: ObserveAllTagUseCase,
     private val upsertTask: UpsertTaskUseCase,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -123,19 +124,24 @@ class TaskListViewModel @Inject constructor(
 
     private val _groups = observeAllGroup()
 
+    private val _tags = observeAllTag()
+
     val uiState = combine(
         _tasks,
         _groups,
+        _tags,
         _inputState,
         filterArg,
-    ) { tasks, groups, inputState, args ->
+    ) { tasks, groups, tags, inputState, args ->
         TaskListUiState(
             tasks = tasks.filter { task -> !task.isFinished },
             completedTasks = tasks.filter { task -> task.isFinished },
             groups = groups,
+            tags = tags,
+            selectedTagId = inputState.selectedTagId ?: args.tagId,
+            selectedGroupId = inputState.selectedGroupId ?: args.groupId,
+            isFilterOpen = inputState.isFilterOpen,
             shouldNavigateBack = inputState.shouldNavigateBack,
-            selectedTagId = args.tagId,
-            selectedGroupId = args.groupId,
         )
     }.stateIn(
         viewModelScope,
@@ -149,8 +155,23 @@ class TaskListViewModel @Inject constructor(
             is TaskListEvent.TaskFinishClick -> handleTaskFinishClick(event.task)
             is TaskListEvent.FilterByTag -> handleFilterByTag(event.tagId)
             is TaskListEvent.FilterByGroup -> handleFilterByGroup(event.groupId)
+            TaskListEvent.FilterButtonClick -> handleFilterButtonClick()
+            TaskListEvent.DismissFilter -> handleDismissFilter()
+            TaskListEvent.SaveFilter -> handleSaveFilter()
             TaskListEvent.ResetFilter -> handleResetFilter()
         }
+    }
+
+    private fun handleSaveFilter() {
+        _inputState.update { old -> old.copy(isFilterOpen = false) }
+    }
+
+    private fun handleDismissFilter() {
+        _inputState.update { old -> old.copy(isFilterOpen = false) }
+    }
+
+    private fun handleFilterButtonClick() {
+        _inputState.update { old -> old.copy(isFilterOpen = true) }
     }
 
     private fun handleResetFilter() {
