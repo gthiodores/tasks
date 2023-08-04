@@ -104,19 +104,19 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun handleAllTasksClick() {
-        _navigation.update { HomeNavigationTarget.TaskList(TaskFilterQuery.ALL, null, null) }
+        _navigation.update { HomeNavigationTarget.TaskList(TaskFilterQuery.ALL, null, uiState.value.selectedTag?.id) }
     }
 
     private fun handleGroupItemClick(group: DomainGroup) {
-        _navigation.update { HomeNavigationTarget.TaskList(null, group.id, null) }
+        _navigation.update { HomeNavigationTarget.TaskList(null, group.id, uiState.value.selectedTag?.id) }
     }
 
     private fun handleImportantClick() {
-        _navigation.update { HomeNavigationTarget.TaskList(TaskFilterQuery.IMPORTANT, null, null) }
+        _navigation.update { HomeNavigationTarget.TaskList(TaskFilterQuery.IMPORTANT, null, uiState.value.selectedTag?.id) }
     }
 
     private fun handleTodayClick() {
-        _navigation.update { HomeNavigationTarget.TaskList(TaskFilterQuery.TODAY, null, null) }
+        _navigation.update { HomeNavigationTarget.TaskList(TaskFilterQuery.TODAY, null, uiState.value.selectedTag?.id) }
     }
 
     fun homeNavigationDone() { _navigation.update { null } }

@@ -85,10 +85,9 @@ fun inMemoryTaskSource(): TaskLocalSource = object : TaskLocalSource {
                                 .toLocalDateTime(TimeZone.currentSystemDefault()).date == LocalDate.now()
                                 .toKotlinLocalDate()
                         }
-
                         TaskQuery.IsImportant -> result.filter { task -> task.isImportant }
-                        is TaskQuery.HasGroupWithId -> result.filter { task -> task.group.id == query.id }
-                        is TaskQuery.HasTagWithId -> result.filter { task -> task.tags.any { tag -> tag.id == query.id } }
+                        is TaskQuery.HasGroupWithId -> result.filter { task -> query.ids.any { id -> task.group.id == id } }
+                        is TaskQuery.HasTagWithId -> result.filter { task -> task.tags.any { tag -> query.id.any { id -> tag.id == id } } }
                     }
                 }
                 return@map result

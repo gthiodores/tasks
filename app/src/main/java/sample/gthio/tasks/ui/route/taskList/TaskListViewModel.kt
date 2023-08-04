@@ -82,9 +82,9 @@ class TaskListViewModel @Inject constructor(
         }
 
         if (filterState.selectedGroupId.isNotEmpty())
-            taskQueries += filterState.selectedGroupId.map { groupId -> TaskQuery.HasGroupWithId(groupId) }
+            taskQueries += TaskQuery.HasGroupWithId(filterState.selectedGroupId)
         if (filterState.selectedTagId.isNotEmpty())
-            taskQueries += filterState.selectedTagId.map { tagId -> TaskQuery.HasTagWithId(tagId) }
+            taskQueries += TaskQuery.HasTagWithId(filterState.selectedTagId)
 
         when (taskQueries) {
             emptyList<TaskQuery>() -> observeAllTask()

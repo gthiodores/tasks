@@ -5,6 +5,6 @@ import java.util.UUID
 sealed interface TaskQuery {
     object isToday: TaskQuery
     object IsImportant: TaskQuery
-    data class HasTagWithId(val id: UUID): TaskQuery
-    data class HasGroupWithId(val id: UUID): TaskQuery
+    data class HasTagWithId(val id: List<UUID>): TaskQuery
+    data class HasGroupWithId(val ids: List<UUID>): TaskQuery
 }
