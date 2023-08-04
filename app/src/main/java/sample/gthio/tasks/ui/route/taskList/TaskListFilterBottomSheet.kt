@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import sample.gthio.tasks.domain.model.DomainGroup
 import sample.gthio.tasks.domain.model.toColor
@@ -41,17 +42,44 @@ fun TaskListFilterBottomSheet(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        item {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                TaskListResetFilterButton(
+                    onClick = { onEvent(TaskListEvent.ResetFilter) }
+                )
+            }
+        }
         taskListTagChipGroup(uiState = uiState, onEvent = onEvent)
         taskListGroupList(uiState = uiState, onEvent = onEvent)
         item {
-            AddTaskSaveButton(
-                modifier = Modifier.padding(16.dp),
-                onClick = { onEvent(TaskListEvent.SaveFilter) }
-            )
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                AddTaskSaveButton(
+                    modifier = Modifier.padding(16.dp),
+                    onClick = { onEvent(TaskListEvent.SaveFilter) }
+                )
+            }
         }
     }
+}
+
+@Composable
+fun TaskListResetFilterButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Text(
+        modifier = modifier
+            .clickable { onClick() },
+        text = "Reset Filter",
+        color = Color.Red
+    )
 }
 
 fun LazyListScope.taskListGroupList(
@@ -139,7 +167,8 @@ fun LazyListScope.taskListTagChipGroup(
     item {
         FlowRow(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .padding(top = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {

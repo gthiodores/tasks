@@ -67,6 +67,7 @@ fun TaskListRoute(
             onDismissRequest = { viewModel.onEvent(TaskListEvent.DismissFilter) }
         ) {
             TaskListFilterBottomSheet(uiState = uiState, onEvent = viewModel::onEvent)
+            Spacer(modifier = Modifier.padding(16.dp))
         }
     }
 
@@ -102,9 +103,7 @@ fun TaskListRoute(
                 .tasks
                 .groupBy { task -> task.group.title }
                 .forEach { (key, entry) ->
-                    stickyHeader {
-                        TaskListItemHeader(title = key)
-                    }
+                    item { TaskListItemHeader(title = key) }
                     items(items = entry, key = { task -> task.id }) { task ->
                         TaskListItem(
                             modifier = Modifier.animateItemPlacement(animationSpec = tween(1000)),
