@@ -18,6 +18,7 @@ data class TaskListUiState(
 )
 
 data class TaskListInputState(
+    val filterQuery: TaskFilterQuery = TaskFilterQuery.ALL,
     val selectedGroupId: List<UUID> = emptyList(),
     val selectedTagId: List<UUID> = emptyList(),
     val isFilterOpen: Boolean = false,
@@ -33,9 +34,3 @@ data class TaskListInputState(
             .addOrRemoveDuplicate(tagId) { a, b -> a == b }
     )
 }
-
-data class TaskListFilterState(
-    val filterQuery: TaskFilterQuery = TaskFilterQuery.ALL,
-    val selectedGroupId: List<UUID> = emptyList(),
-    val selectedTagId: List<UUID> = emptyList(),
-)
