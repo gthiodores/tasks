@@ -58,7 +58,7 @@ fun TaskListFilterBottomSheet(
         item {
             Box(
                 modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.CenterEnd
+                contentAlignment = Alignment.Center
             ) {
                 AddTaskSaveButton(
                     modifier = Modifier.padding(16.dp),
