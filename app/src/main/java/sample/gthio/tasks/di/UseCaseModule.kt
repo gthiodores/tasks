@@ -97,4 +97,22 @@ object UseCaseModule {
         groupRepository: GroupRepository
     ): ObserveAvailableGroupColorUseCase =
         ObserveAvailableGroupColorUseCase(groupRepository)
+
+    @Provides
+    fun provideDeleteGroup(
+        groupRepository: GroupRepository
+    ): DeleteGroupUseCase =
+        DeleteGroupUseCase(groupRepository)
+
+    @Provides
+    fun provideDeleteTag(
+        tagRepository: TagRepository
+    ): DeleteTagUseCase =
+        DeleteTagUseCase(tagRepository)
+
+    @Provides
+    fun provideDeleteTask(
+        taskRepository: TaskRepository
+    ): DeleteTaskUseCase =
+        DeleteTaskUseCase(taskRepository)
 }
