@@ -8,7 +8,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import sample.gthio.tasks.domain.model.DomainTask
-import sample.gthio.tasks.domain.model.TaskQuery
 import sample.gthio.tasks.domain.usecase.*
 import java.util.*
 import javax.inject.Inject
@@ -32,8 +31,7 @@ enum class TaskFilterQuery(val arg: String) {
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class TaskListViewModel @Inject constructor(
-    observeAllTask: ObserveAllTaskUseCase,
-    observeAllTaskByQueries: ObserveTaskByQueriesUseCase,
+    observeAllTaskWithQuery: ObserveTaskWithQuery,
     observeAllGroup: ObserveAllGroupUseCase,
     observeAllTag: ObserveAllTagUseCase,
     private val upsertTask: UpsertTaskUseCase,
@@ -60,26 +58,9 @@ class TaskListViewModel @Inject constructor(
         )
     )
 
-    private val _tasks = _inputState.flatMapLatest { inputState ->
-        val taskQueries: MutableList<TaskQuery> = mutableListOf()
-
-        when (inputState.filterQuery) {
-            TaskFilterQuery.ALL -> {}
-            TaskFilterQuery.TODAY -> taskQueries += TaskQuery.isToday
-            TaskFilterQuery.IMPORTANT -> taskQueries += TaskQuery.IsImportant
-            TaskFilterQuery.SCHEDULED -> {}
-        }
-
-        if (inputState.selectedGroupId.isNotEmpty())
-            taskQueries += TaskQuery.HasGroupWithId(inputState.selectedGroupId)
-        if (inputState.selectedTagId.isNotEmpty())
-            taskQueries += TaskQuery.HasTagWithId(inputState.selectedTagId)
-
-        when (taskQueries) {
-            emptyList<TaskQuery>() -> observeAllTask()
-            else -> observeAllTaskByQueries(taskQueries)
-        }
-    }
+    private val _tasks = _inputState
+        .map(TaskListInputState::toQuery)
+        .flatMapLatest(observeAllTaskWithQuery::invoke)
 
     private val _groups = observeAllGroup()
 

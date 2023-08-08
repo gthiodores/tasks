@@ -8,6 +8,7 @@ import sample.gthio.tasks.data.model.DataTask
 import sample.gthio.tasks.data.source.TaskLocalSource
 import sample.gthio.tasks.domain.model.DomainTask
 import sample.gthio.tasks.domain.model.TaskQuery
+import sample.gthio.tasks.domain.model.TaskQueryModel
 import sample.gthio.tasks.domain.repository.TaskRepository
 import java.util.*
 
@@ -61,6 +62,13 @@ fun defaultTaskRepository(taskSource: TaskLocalSource): TaskRepository = object 
         return taskSource
             .observeTaskByQueries(queries)
             .map { tasks -> tasks.map(DataTask::toDomain) }
+            .flowOn(Dispatchers.IO)
+    }
+
+    override fun observeTaskByQueryModel(query: TaskQueryModel): Flow<List<DomainTask>> {
+        return taskSource
+            .observeTaskByQuery(query)
+            .map { flow -> flow.map(DataTask::toDomain) }
             .flowOn(Dispatchers.IO)
     }
 }
