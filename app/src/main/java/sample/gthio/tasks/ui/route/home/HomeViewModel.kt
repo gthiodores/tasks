@@ -1,5 +1,6 @@
 package sample.gthio.tasks.ui.route.home
 
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -11,13 +12,20 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import sample.gthio.tasks.domain.model.DomainGroup
 import sample.gthio.tasks.domain.model.DomainTag
+import sample.gthio.tasks.domain.model.toGroupColor
 import sample.gthio.tasks.domain.usecase.ObserveAllGroupUseCase
 import sample.gthio.tasks.domain.usecase.ObserveAllTagUseCase
 import sample.gthio.tasks.domain.usecase.ObserveAllTaskUseCase
+import sample.gthio.tasks.domain.usecase.ObserveAvailableGroupColorUseCase
 import sample.gthio.tasks.domain.usecase.ObserveTaskByTagUseCase
+import sample.gthio.tasks.domain.usecase.UpsertGroupUseCase
+import sample.gthio.tasks.ui.extension.updateNotNull
 import sample.gthio.tasks.ui.model.UiGroup
+import sample.gthio.tasks.ui.route.home.editgroup.EditGroupEvent
+import sample.gthio.tasks.ui.route.home.editgroup.EditGroupState
 import sample.gthio.tasks.ui.route.taskList.TaskFilterQuery
 import javax.inject.Inject
 
@@ -26,6 +34,8 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val observeAllTask: ObserveAllTaskUseCase,
     private val observeTaskByTag: ObserveTaskByTagUseCase,
+    private val upsertGroup: UpsertGroupUseCase,
+    observeAvailableGroupColor: ObserveAvailableGroupColorUseCase,
     observeAllGroup: ObserveAllGroupUseCase,
     observeAllTag: ObserveAllTagUseCase,
 ) : ViewModel() {
@@ -73,6 +83,19 @@ class HomeViewModel @Inject constructor(
         HomeUiState()
     )
 
+    private val _availableGroupColor = observeAvailableGroupColor()
+
+    private val _editGroupState = MutableStateFlow<EditGroupState?>(null)
+    val editGroupState = _editGroupState
+        .combine(_availableGroupColor) { editGroupState, availableColorGroup ->
+            EditGroupState.fromInput(editGroupState, availableColorGroup)
+        }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5_000),
+            null,
+        )
+
     fun onEvent(event: HomeEvent) {
         when (event) {
             is HomeEvent.SelectAllTags -> handleSelectAllTag()
@@ -83,7 +106,7 @@ class HomeViewModel @Inject constructor(
             HomeEvent.ImportantClick -> handleImportantClick()
             HomeEvent.TodayClick -> handleTodayClick()
             is HomeEvent.GroupItemClick -> handleGroupItemClick(event.group)
-
+            is HomeEvent.GroupItemLongClick -> handleGroupItemLongClick(event.group)
         }
     }
 
@@ -117,6 +140,53 @@ class HomeViewModel @Inject constructor(
 
     private fun handleTodayClick() {
         _navigation.update { HomeNavigationTarget.TaskList(TaskFilterQuery.TODAY, null, uiState.value.selectedTag?.id) }
+    }
+
+    private fun handleGroupItemLongClick(group: DomainGroup) {
+        _editGroupState.update {
+            EditGroupState(
+                groupId = group.id,
+                groupTitle = group.title,
+                groupColor = group.groupColor
+            )
+        }
+    }
+
+    fun onEditGroupEvent(event: EditGroupEvent) {
+        when (event) {
+            is EditGroupEvent.TitleValueChange -> handleEditGroupTitleValueChange(event.title)
+            is EditGroupEvent.SelectColor -> handleEditGroupSelectColor(event.color)
+            EditGroupEvent.CloseWithoutSaving -> handleEditGroupCloseWithoutSaving()
+            EditGroupEvent.SaveButtonClick -> handleEditGroupSaveButtonClick()
+        }
+    }
+
+    private fun handleEditGroupTitleValueChange(title: String) {
+        _editGroupState.updateNotNull { old -> old.copy(groupTitle = title) }
+    }
+
+    private fun handleEditGroupSelectColor(color: Color) {
+        _editGroupState.updateNotNull { old -> old.copy(groupColor = toGroupColor(color)!!) }
+    }
+
+    private fun handleEditGroupCloseWithoutSaving() {
+        _editGroupState.update { null }
+    }
+
+    private fun handleEditGroupSaveButtonClick() {
+        val editGroupState = editGroupState.value ?: return
+
+        viewModelScope.launch {
+            upsertGroup(
+                DomainGroup(
+                    id = editGroupState.groupId,
+                    title = editGroupState.groupTitle,
+                    groupColor = editGroupState.groupColor
+                )
+            )
+        }
+
+        _editGroupState.update { null }
     }
 
     fun homeNavigationDone() { _navigation.update { null } }

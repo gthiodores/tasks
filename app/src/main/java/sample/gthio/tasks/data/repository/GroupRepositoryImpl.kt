@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import sample.gthio.tasks.data.source.GroupLocalSource
 import sample.gthio.tasks.domain.model.DomainGroup
+import sample.gthio.tasks.domain.model.GroupColor
 import sample.gthio.tasks.domain.repository.GroupRepository
 import java.util.*
 
@@ -15,6 +16,10 @@ fun defaultGroupRepository(groupSource: GroupLocalSource): GroupRepository = obj
         get() = groupSource
             .groups
             .map { value -> value.map(DataGroup::toDomain) }
+    override val groupColors: List<GroupColor>
+        get() = groupSource.groupColors
+    override val availableColors: Flow<List<GroupColor>>
+        get() = groupSource.availableColors
 
     override suspend fun insertGroup(group: DomainGroup) {
         groupSource.insert(group)

@@ -79,4 +79,22 @@ object UseCaseModule {
         taskRepository: TaskRepository
     ): ObserveTaskWithQuery =
         ObserveTaskWithQuery(taskRepository)
+
+    @Provides
+    fun provideObserveTaskById(
+        taskRepository: TaskRepository
+    ): ObserveTaskUseCase =
+        ObserveTaskUseCase(taskRepository)
+
+    @Provides
+    fun provideGetAllGroupColor(
+        groupRepository: GroupRepository
+    ): GetAllGroupColorUseCase =
+        GetAllGroupColorUseCase(groupRepository)
+
+    @Provides
+    fun provideObserveAvailableGroupColor(
+        groupRepository: GroupRepository
+    ): ObserveAvailableGroupColorUseCase =
+        ObserveAvailableGroupColorUseCase(groupRepository)
 }
