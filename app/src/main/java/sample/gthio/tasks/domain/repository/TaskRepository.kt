@@ -2,6 +2,7 @@ package sample.gthio.tasks.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import sample.gthio.tasks.domain.model.DomainTask
+import sample.gthio.tasks.domain.model.TaskQuery
 import java.util.UUID
 
 interface TaskRepository {
@@ -20,4 +21,6 @@ interface TaskRepository {
     fun observeTaskByTagAndGroup(tagId: UUID, groupId: UUID): Flow<List<DomainTask>>
 
     fun observeTaskByGroup(groupId: UUID): Flow<List<DomainTask>>
+
+    fun observeTaskByQueries(queries: List<TaskQuery>): Flow<List<DomainTask>>
 }

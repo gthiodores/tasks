@@ -8,6 +8,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import sample.gthio.tasks.domain.model.DomainTask
+import sample.gthio.tasks.domain.model.TaskQuery
 import sample.gthio.tasks.domain.usecase.*
 import java.util.*
 import javax.inject.Inject
@@ -28,99 +29,77 @@ enum class TaskFilterQuery(val arg: String) {
     }
 }
 
-sealed class TaskListQuery {
-    abstract val filter: TaskFilterQuery
-    abstract val groupId: UUID?
-    abstract val tagId: UUID?
-
-    data class QueryByGroup(
-        override val filter: TaskFilterQuery,
-        override val groupId: UUID,
-    ) : TaskListQuery() {
-        override val tagId: UUID? = null
-    }
-
-    data class QueryByTag(
-        override val filter: TaskFilterQuery,
-        override val tagId: UUID,
-    ) : TaskListQuery() {
-        override val groupId: UUID? = null
-    }
-
-    data class QueryByGroupAndTag(
-        override val filter: TaskFilterQuery,
-        override val groupId: UUID,
-        override val tagId: UUID,
-    ) : TaskListQuery()
-
-    data class QueryByNone(
-        override val filter: TaskFilterQuery
-    ) : TaskListQuery() {
-        override val groupId: UUID? = null
-        override val tagId: UUID? = null
-    }
-}
-
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class TaskListViewModel @Inject constructor(
     observeAllTask: ObserveAllTaskUseCase,
-    observeTaskByTag: ObserveTaskByTagUseCase,
-    observeAllTaskByGroup: ObserveAllTaskByGroupUseCase,
-    observeAllTaskByGroupAndTag: ObserveAllTaskByGroupAndTagUseCase,
+    observeAllTaskByQueries: ObserveTaskByQueriesUseCase,
     observeAllGroup: ObserveAllGroupUseCase,
+    observeAllTag: ObserveAllTagUseCase,
     private val upsertTask: UpsertTaskUseCase,
-    private val savedStateHandle: SavedStateHandle,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val queryFromArgs = savedStateHandle
-        .getStateFlow<String?>("query", null)
-        .map { query -> TaskFilterQuery.fromArg(query.orEmpty()) }
+        .get<String?>("filterQuery")
+        .let { query -> TaskFilterQuery.fromArg(query.orEmpty()) }
+
     private val groupIdFromArgs = savedStateHandle
-        .getStateFlow<String?>("groupId", null)
-        .map { groupId -> groupId?.let(UUID::fromString) }
+        .get<String?>("groupId")
+        .let { groupId -> groupId?.let(UUID::fromString) }
+
     private val tagIdFromArgs = savedStateHandle
-        .getStateFlow<String?>("tagId", null)
-        .map { tagId -> tagId?.let(UUID::fromString) }
-    private val filterArg = combine(
-        queryFromArgs,
-        groupIdFromArgs,
-        tagIdFromArgs,
-    ) { filter, group, tag ->
-        when {
-            tag != null && group != null -> TaskListQuery.QueryByGroupAndTag(filter, group, tag)
-            tag != null -> TaskListQuery.QueryByTag(filter, tag)
-            group != null -> TaskListQuery.QueryByGroup(filter, group)
-            else -> TaskListQuery.QueryByNone(filter)
+        .get<String?>("tagId")
+        .let { tagId -> tagId?.let(UUID::fromString) }
+
+    private val _inputState = MutableStateFlow(
+        TaskListInputState(
+            filterQuery = queryFromArgs,
+            selectedGroupId = if (groupIdFromArgs != null) listOf(groupIdFromArgs) else emptyList(),
+            selectedTagId = if (tagIdFromArgs != null) listOf(tagIdFromArgs) else emptyList()
+        )
+    )
+
+    private val _tasks = _inputState.flatMapLatest { inputState ->
+        val taskQueries: MutableList<TaskQuery> = mutableListOf()
+
+        when (inputState.filterQuery) {
+            TaskFilterQuery.ALL -> {}
+            TaskFilterQuery.TODAY -> taskQueries += TaskQuery.isToday
+            TaskFilterQuery.IMPORTANT -> taskQueries += TaskQuery.IsImportant
+            TaskFilterQuery.SCHEDULED -> {}
+        }
+
+        if (inputState.selectedGroupId.isNotEmpty())
+            taskQueries += TaskQuery.HasGroupWithId(inputState.selectedGroupId)
+        if (inputState.selectedTagId.isNotEmpty())
+            taskQueries += TaskQuery.HasTagWithId(inputState.selectedTagId)
+
+        when (taskQueries) {
+            emptyList<TaskQuery>() -> observeAllTask()
+            else -> observeAllTaskByQueries(taskQueries)
         }
     }
-
-    private val _tasks = filterArg.flatMapLatest { query ->
-        when (query) {
-            is TaskListQuery.QueryByGroup -> observeAllTaskByGroup(query.groupId)
-            is TaskListQuery.QueryByGroupAndTag -> observeAllTaskByGroupAndTag(query.groupId, query.tagId)
-            is TaskListQuery.QueryByNone -> observeAllTask()
-            is TaskListQuery.QueryByTag -> observeTaskByTag(query.tagId)
-        }
-    }
-
-    private val _inputState = MutableStateFlow(TaskListInputState())
 
     private val _groups = observeAllGroup()
+
+    private val _tags = observeAllTag()
 
     val uiState = combine(
         _tasks,
         _groups,
-        _inputState,
-        filterArg,
-    ) { tasks, groups, inputState, args ->
+        _tags,
+        _inputState
+    ) { tasks, groups, tags, inputState ->
         TaskListUiState(
             tasks = tasks.filter { task -> !task.isFinished },
             completedTasks = tasks.filter { task -> task.isFinished },
             groups = groups,
+            tags = tags,
+            selectedTagId = inputState.selectedTagId,
+            selectedGroupId = inputState.selectedGroupId,
+            isFilterOpen = inputState.isFilterOpen,
             shouldNavigateBack = inputState.shouldNavigateBack,
-            selectedTagId = args.tagId,
-            selectedGroupId = args.groupId,
         )
     }.stateIn(
         viewModelScope,
@@ -132,23 +111,44 @@ class TaskListViewModel @Inject constructor(
         when (event) {
             TaskListEvent.BackPressed -> handleBackPressed()
             is TaskListEvent.TaskFinishClick -> handleTaskFinishClick(event.task)
+            TaskListEvent.FilterAllTag -> handleFilterAllTag()
             is TaskListEvent.FilterByTag -> handleFilterByTag(event.tagId)
             is TaskListEvent.FilterByGroup -> handleFilterByGroup(event.groupId)
+            TaskListEvent.FilterButtonClick -> handleFilterButtonClick()
+            TaskListEvent.DismissFilter -> handleDismissFilter()
+            TaskListEvent.SaveFilter -> handleSaveFilter()
             TaskListEvent.ResetFilter -> handleResetFilter()
         }
     }
 
+    private fun handleFilterAllTag() {
+        _inputState.update { old -> old.copy(selectedTagId = emptyList()) }
+    }
+
+    private fun handleSaveFilter() {
+        _inputState.update { old -> old.copy(isFilterOpen = false) }
+    }
+
+    private fun handleDismissFilter() {
+        _inputState.update { old -> old.copy(isFilterOpen = false) }
+    }
+
+    private fun handleFilterButtonClick() {
+        _inputState.update { old -> old.copy(isFilterOpen = true) }
+    }
+
     private fun handleResetFilter() {
-        savedStateHandle.remove<String?>("groupId")
-        savedStateHandle.remove<String?>("tagId")
+        _inputState.update { old ->
+            old.copy(selectedTagId = emptyList(), selectedGroupId = emptyList())
+        }
     }
 
-    private fun handleFilterByTag(id: UUID?) {
-        savedStateHandle["tagId"] = id?.toString()
+    private fun handleFilterByTag(tagId: UUID) {
+        _inputState.update { old -> old.selectTag(tagId) }
     }
 
-    private fun handleFilterByGroup(groupId: UUID?) {
-        savedStateHandle.set("groupId", groupId?.toString())
+    private fun handleFilterByGroup(groupId: UUID) {
+        _inputState.update { old -> old.selectGroup(groupId) }
     }
 
     private fun handleBackPressed() {

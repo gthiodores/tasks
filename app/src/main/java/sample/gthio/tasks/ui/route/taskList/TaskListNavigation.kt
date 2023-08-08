@@ -3,14 +3,20 @@ package sample.gthio.tasks.ui.route.taskList
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import sample.gthio.tasks.navigation.Screen
+import sample.gthio.tasks.ui.extension.letAppend
 import java.util.*
 
 fun NavGraphBuilder.taskListNavigation(
     onBack: () -> Unit,
 ) {
     composable(
-        route = Screen.TaskList.route.plus("?groupId={groupId}&tagId={tagId}"),
+        route = Screen.TaskList.route.plus("?filterQuery={filterQuery}&groupId={groupId}&tagId={tagId}"),
         arguments = listOf(
+            navArgument("filterQuery") {
+                type = NavType.StringType
+                defaultValue = null
+                nullable = true
+            },
             navArgument("groupId") {
                 type = NavType.StringType
                 defaultValue = null
@@ -30,27 +36,19 @@ fun NavGraphBuilder.taskListNavigation(
 }
 
 fun NavController.navigateToTaskList(
+    filterQuery: TaskFilterQuery? = TaskFilterQuery.ALL,
     groupId: UUID? = null,
     tagId: UUID? = null,
-    filterQuery: TaskFilterQuery = TaskFilterQuery.ALL,
     navOptions: NavOptions? = null,
 ) {
-    val routeBuilder = StringBuilder(Screen.TaskList.route)
-        .letAppend(groupId) { value -> append("?groupId=$value") }
+    val route = StringBuilder(Screen.TaskList.route)
+        .append("?filterQuery=${filterQuery?.arg ?: TaskFilterQuery.ALL.arg}")
+        .letAppend(groupId) { value -> append("&groupId=$value") }
         .letAppend(tagId) { value -> append("&tagId=$value") }
+        .toString()
 
     navigate(
-        route = Screen.TaskList.route.plus(routeBuilder.toString()),
+        route = route,
         navOptions = navOptions
     )
-}
-
-fun <T> StringBuilder.letAppend(
-    value: T?,
-    f: StringBuilder.(T) -> StringBuilder,
-): StringBuilder {
-    return when (value) {
-        null -> this
-        else -> f(value)
-    }
 }

@@ -1,6 +1,7 @@
 package sample.gthio.tasks.ui.route.addtask
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -45,7 +46,7 @@ fun LazyListScope.addTaskGroupListing(
                 .background(containerWhite),
             group = group,
             isSelected = uiState.selectedGroup == group,
-            onGroupSelected = { selectedGroup -> onEvent(AddTaskEvent.GroupSelect(selectedGroup)) }
+            onClick = { onEvent(AddTaskEvent.GroupSelect(group)) }
         )
     }
 }
@@ -66,12 +67,13 @@ fun AddTaskGroupItem(
     modifier: Modifier = Modifier,
     group: DomainGroup,
     isSelected: Boolean,
-    onGroupSelected: (DomainGroup) -> Unit,
+    onClick: () -> Unit,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .height(56.dp)
+            .clickable { onClick() }
     ) {
         Box(
             modifier = Modifier
@@ -93,8 +95,8 @@ fun AddTaskGroupItem(
             RadioButton(
                 modifier = Modifier.size(24.dp),
                 selected = isSelected,
-                onClick = { onGroupSelected(group) })
-
+                onClick = onClick
+            )
         }
     }
 }

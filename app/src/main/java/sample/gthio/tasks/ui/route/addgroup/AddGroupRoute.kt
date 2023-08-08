@@ -26,6 +26,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -128,10 +129,8 @@ fun AddGroupColorInputList(
             Box(
                 modifier = Modifier
                     .size(24.dp)
-                    .background(
-                        color = color,
-                        shape = CircleShape
-                    )
+                    .clip(CircleShape)
+                    .background(color = color)
                     .clickable { onColorSelect(color) }
             )
         }
