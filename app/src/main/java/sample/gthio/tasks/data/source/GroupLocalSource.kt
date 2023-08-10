@@ -1,14 +1,20 @@
 package sample.gthio.tasks.data.source
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import sample.gthio.tasks.data.model.DataGroup
 import sample.gthio.tasks.domain.model.DomainGroup
+import sample.gthio.tasks.domain.model.GroupColor
 import java.util.*
 
 interface GroupLocalSource {
     val groups: Flow<List<DataGroup>>
+
+    val groupColors: List<GroupColor>
+
+    val availableColors: Flow<List<GroupColor>>
 
     suspend fun insert(group: DomainGroup)
 
@@ -21,9 +27,16 @@ interface GroupLocalSource {
     suspend fun observeById(id: UUID): Flow<DataGroup?>
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
 fun inMemoryGroupSource(): GroupLocalSource = object : GroupLocalSource {
     private val _group = MutableStateFlow<List<DataGroup>>(emptyList())
     override val groups: Flow<List<DataGroup>> = _group.asStateFlow()
+
+    override val groupColors: List<GroupColor> = GroupColor.values().toList()
+    override val availableColors: Flow<List<GroupColor>>
+        get() = _group.map { groups ->
+            groupColors.filterNot { groupColor -> groupColor.id in groups.map { it.colorCode } }
+        }
 
     override suspend fun insert(group: DomainGroup) {
         withContext(Dispatchers.IO) {

@@ -24,6 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import sample.gthio.tasks.R
+import sample.gthio.tasks.ui.route.home.editgroup.EditGroupDialog
 import sample.gthio.tasks.ui.route.taskList.TaskFilterQuery
 import sample.gthio.tasks.ui.theme.containerWhite
 import sample.gthio.tasks.ui.theme.surfaceGray
@@ -41,6 +42,14 @@ fun HomeRoute(
     val navigation by viewModel.navigationTarget.collectAsState()
 
     val uiState by viewModel.uiState.collectAsState()
+    val editGroupState by viewModel.editGroupState.collectAsState()
+
+    editGroupState?.let { state ->
+        EditGroupDialog(
+            state = state,
+            onEvent = viewModel::onEditGroupEvent
+        )
+    }
 
     if (navigation != null) {
         LaunchedEffect(key1 = navigation) {

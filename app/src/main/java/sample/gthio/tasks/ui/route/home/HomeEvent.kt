@@ -12,4 +12,5 @@ sealed interface HomeEvent {
     object ImportantClick: HomeEvent
     object TodayClick: HomeEvent
     data class GroupItemClick(val group: DomainGroup): HomeEvent
+    data class GroupItemLongClick(val group: DomainGroup): HomeEvent
 }
